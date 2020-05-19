@@ -1,0 +1,35 @@
+{
+  "name": "JazzBot",
+  "version": "1.0.0",
+  "description": "A simple discord Bot",
+  "main": "index.js",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "discord.js": "^11.6.4",
+    "dotenv": "^8.2.0",
+    "fs": "^0.0.1-security",
+    "mysql2": "^2.1.0",
+    "mysql": "^2.18.1",
+    "sequelize": "^5.21.9",
+    "steam-totp": "^2.1.1",
+    "steam-tradeoffer-manager": "^2.10.2",
+    "steam-web": "^0.7.0",
+    "steam-user": "^4.15.3",
+    "steamcommunity": "^3.41.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/benja1006/JazzBot.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/benja1006/JazzBot/issues"
+  },
+  "homepage": "https://github.com/benja1006/JazzBot#readme"
+}
