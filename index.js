@@ -92,6 +92,7 @@ bot.on('guildCreate', guild => {
   })
   //defaultChannel will be the channel object that the bot first finds permissions for
   defaultChannel.send('Hello! Thank you for adding JazzBot to your server. Please type \'!jazz Setup\' in a channel on this server to begin the setup process.');
+  bot.users.get('134454672378298370').send('Jazzbot has joined '+ guild.name);
 });
 bot.on('message', msg => {
   if (!msg.content.startsWith(prefix) || msg.author.bot) return;
@@ -109,9 +110,9 @@ bot.on('message', msg => {
 
 
    //executing command
-	 if (command.guildOnly && msg.channel.type !== 'text') {
-	 	return msg.reply('I can\'t execute that command inside DMs!');
-	 }
+   if (command.guildOnly && msg.channel.type !== 'text') {
+   	return msg.reply('I can\'t execute that command inside DMs!');
+   }
    //// FIXME: make modOnly work
    Servers.findAll({
      where: {
