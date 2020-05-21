@@ -106,37 +106,56 @@ bot.on('message', msg => {
   }
   //cooldown code
   const command = bot.commands.get(commandName);
-  if (!cooldowns.has(command.name)) {
-	   cooldowns.set(command.name, new Discord.Collection());
-   }
 
-   const now = Date.now();
-   const timestamps = cooldowns.get(command.name);
-   const cooldownAmount = (command.cooldown || 3) * 1000;
-
-   if (timestamps.has(msg.author.id) && msg.author.id != DMNGRID) {
-	    const expirationTime = timestamps.get(msg.author.id) + cooldownAmount;
-
-	     if (now < expirationTime) {
-		       const timeLeft = (expirationTime - now) / 1000;
-		       return msg.reply(`please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`);
-	     }
-   }
-   timestamps.set(msg.author.id, now);
-   setTimeout(() => timestamps.delete(msg.author.id), cooldownAmount);
 
    //executing command
 	 if (command.guildOnly && msg.channel.type !== 'text') {
 	 	return msg.reply('I can\'t execute that command inside DMs!');
 	 }
    //// FIXME: make modOnly work
-	 if(command.modOnly && msg.author.id != DMNGRID){
-		 return msg.reply('This command can only be used by a moderator');
-	 }
-   try {
-     command.execute(msg, args);
-   } catch (error) {
-     console.error(error);
-     msg.reply('There was an error trying to execute that command!');
-   }
+   Servers.findAll({
+     where: {
+       Server: msg.guild.id
+     }
+   }).then(Server => {
+     let modRole = Server[0].ManagerRole;
+     let authorID = msg.author.id;
+     let guildAuthor = msg.guild.members.get(msg.author.id);
+     if(modRole == null && command.modOnly){
+       return msg.reply('This is a Mod Only Command. Please assign a modRole to use it.');
+     }
+     if(guildAuthor.roles == null){
+       return msg.reply('This command can only be used by a moderator.');
+     }
+     if(command.modOnly && guildAuthor.roles.get(modRole) == null){
+  		 return msg.reply('This command can only be used by a moderator');
+  	 }
+     //Cooldowns
+     if (!cooldowns.has(command.name)) {
+   	   cooldowns.set(command.name, new Discord.Collection());
+      }
+
+      const now = Date.now();
+      const timestamps = cooldowns.get(command.name);
+      const cooldownAmount = (command.cooldown || 3) * 1000;
+      //if cooldown is running and author is not mod
+      if (timestamps.has(msg.author.id) && guildAuthor.roles != null && guildAuthor.roles.find(modRole) == null) {
+   	    const expirationTime = timestamps.get(msg.author.id) + cooldownAmount;
+
+   	     if (now < expirationTime) {
+   		       const timeLeft = (expirationTime - now) / 1000;
+   		       return msg.reply(`please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`);
+   	     }
+      }
+      timestamps.set(msg.author.id, now);
+      setTimeout(() => timestamps.delete(msg.author.id), cooldownAmount);
+
+      //command execution
+     try {
+       command.execute(msg, args);
+     } catch (error) {
+       console.error(error);
+       msg.reply('There was an error trying to execute that command!');
+     }
+   });
 });
