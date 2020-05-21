@@ -1,0 +1,144 @@
+const prefix = process.env.PREFIX + ' ';
+module.exports = {
+  name: 'setup',
+  description: 'Setup JazzBot on your server',
+  aliases: ['setup'],
+  usage: ['setup (id)'],
+  cooldown: 5,
+  execute(msg, args) {
+    const SQLUSERNAME = process.env.SQLUSERNAME;
+    const SQLPASSWORD = process.env.SQLPASSWORD;
+    const prefix = process.env.PREFIX + ' ';
+    const Sequelize = require('sequelize');
+    const sequelize = new Sequelize('jazzbot', SQLUSERNAME, SQLPASSWORD, {
+      host: 'localhost',
+      dialect: 'mysql'
+    });
+    const Model = Sequelize.Model;
+    class Servers extends Model {}
+    Servers.init({
+      ID: {
+        type: Sequelize.INTEGER(4),
+        primaryKey: true,
+        autoIncrement: true
+      },
+      Server: {
+        type: Sequelize.BIGINT(18),
+        autoIncrement: false
+      },
+      General: {
+        type: Sequelize.BIGINT(18),
+        autoIncrement: false
+      },
+      Suggest: {
+        type: Sequelize.BIGINT(18),
+        autoIncrement: false
+      },
+      ManagerRole: {
+        type: Sequelize.BIGINT(18),
+        autoIncrement: false
+      }
+    }, {
+      sequelize,
+      modelName: 'Servers'
+    });
+
+    Servers.sync().then(() => {
+      Servers.findAll({
+        where: {
+          Server: msg.guild.id
+        }
+      }).then(Server => {
+        console.log(Server[0].ID);
+        if(args.length == 0){
+
+            msg.channel.send("First, I need to know who should have mod priveledges on this bot.");
+            msg.channel.send("Please type \'" + prefix +"setup mod\' followed by the id of the lowest role you would like to give mod priveledges for the bot.");
+            return;
+
+        }
+        else{
+          switch(args[0].toLowerCase()){
+            case 'mod':
+              if(args.length == 2){
+                console.log(args);
+                  let modRole = msg.guild.roles.get(args[1]);
+                  if(modRole == null){
+                    return msg.channel.send("This is not a valid role id");
+                  }
+                  msg.channel.send("The "+ modRole.name +" role has been given moderator priveledges");
+                  Servers.update({
+                    ManagerRole: args[1]
+                  },
+                  { where: {
+                    Server: msg.guild.id
+                  }});
+
+              }
+              break;
+            case 'general':
+              if(args.length == 1){
+                if(msg.channel.type != 'text'){
+                  return msg.channel.send("Please use this either in the general channel, or followed by the id of the general channel");
+                }
+                Servers.update({
+                  General: msg.channel.id
+                },
+                { where: {
+                  Server: msg.guild.id
+                }});
+                msg.channel.send("This channel has been set as the general channel for the server.");
+                if(Server.Suggest == null){
+                  msg.channel.send("If you would like to add suggestions, please type \'" + prefix +"setup suggest\' in the channel you would like to receive suggestions.");
+                }
+                return;
+              }
+              else if(args.length == 2){
+                msg.guild.channels.find(args[2]).then(() => {
+                  Servers.update({
+                    General: args[2]
+
+                  },
+                  { where: {
+                    Server: msg.guild.id
+                  }});
+                  msg.channel.send("You have updated the general channel for the server.")
+                  if(Server[0].Suggest == null){
+                    msg.channel.send("If you would like to add suggestions, please type \'" + prefix +"setup suggest\' in the channel you would like to receive suggestions.");
+                  }
+                }).catch(msg.channel.send("This is not a valid channel id"));
+                return;
+              }
+              break;
+            case 'suggest':
+              if(args.length == 1){
+                if(msg.channel.type != 'text'){
+                  return msg.channel.send("Please use this either in the suggest channel, or followed by the id of the suggest channel");
+                }
+                Servers.update({
+                  Suggest: msg.channel.id
+                },
+                { where: {
+                  Server: msg.guild.id
+                }});
+                msg.channel.send("This channel has been set as the suggest channel for the server.");
+                return;
+              }
+              else if(args.length == 2){
+                msg.guild.channels.find(args[2]).then(() => {
+                  Servers.update({
+                    Suggest: args[2]
+                  },
+                  { where: {
+                    Server: msg.guild.id
+                  }});
+                  msg.channel.send("You have updated the suggest channel for the server.")
+                }).catch(msg.channel.send("This is not a valid channel id"));
+                return;
+              }
+          }
+        }
+      });
+    });
+  },
+};

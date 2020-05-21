@@ -2,10 +2,54 @@ const fs = require('fs');
 const http = require('http');
 const url = require('url');
 const path = require('path');
-
+require('dotenv').config();
+//Mysql connection
+const Sequelize = require('sequelize');
+const SQLUSERNAME = process.env.SQLUSERNAME;
+const SQLPASSWORD = process.env.SQLPASSWORD;
+const Model = Sequelize.Model;
+const sequelize = new Sequelize('jazzbot', SQLUSERNAME, SQLPASSWORD, {
+  host: 'localhost',
+  dialect: 'mysql'
+});
+sequelize
+  .authenticate()
+  .then(() => {
+    console.log('Connection has been established successfully.');
+  })
+  .catch(err => {
+    console.error('Unable to connect to the database:', err);
+  });
+class Servers extends Model {}
+Servers.init({
+  ID: {
+    type: Sequelize.INTEGER(4),
+    primaryKey: true,
+    autoIncrement: true
+  },
+  Server: {
+    type: Sequelize.BIGINT(18),
+    autoIncrement: false
+  },
+  General: {
+    type: Sequelize.BIGINT(18),
+    autoIncrement: false
+  },
+  Suggest: {
+    type: Sequelize.BIGINT(18),
+    autoIncrement: false
+  },
+  ManagerRole: {
+    type: Sequelize.BIGINT(18),
+    autoIncrement: false
+  }
+}, {
+  sequelize,
+  modelName: 'Servers'
+});
 
 //discord setup
-require('dotenv').config();
+
 const Discord = require('discord.js');
 const bot = new Discord.Client();
 const cooldowns = new Discord.Collection();
@@ -23,13 +67,34 @@ for (const file of commandFiles) {
 //discord login
 bot.login(TOKEN);
 bot.on('ready', () => {
-	bot.user.setPresence({game: {name: '= suggest'}});
+	bot.user.setPresence({game: {name: '!jazz'}});
 		console.info(`Logged into discord as ${bot.user.tag}!`);
     //const defaultChannel = bot.channels.get(process.env.DEFAULT);
 });
 
+//When added to a new server
+bot.on('guildCreate', guild => {
+  //Start mysql connection
+	 //add server to mysql table
+  Servers.sync({force: true}).then(() => {
+    Servers.create({
+      Server: guild.id
+    });
+  });
+  console.log(guild.id);
+  let defaultChannel = "";
+  guild.channels.forEach((channel) => {
+    if(channel.type == "text" && defaultChannel == "") {
+      if(channel.permissionsFor(guild.me).has("SEND_MESSAGES")) {
+        defaultChannel = channel;
+      }
+    }
+  })
+  //defaultChannel will be the channel object that the bot first finds permissions for
+  defaultChannel.send('Hello! Thank you for adding JazzBot to your server. Please type \'!jazz Setup\' in a channel on this server to begin the setup process.');
+});
 bot.on('message', msg => {
-	if (!msg.content.startsWith(prefix) || msg.author.bot) return;
+  if (!msg.content.startsWith(prefix) || msg.author.bot) return;
 	//back to normal command code
   const args = msg.content.slice(prefix.length).split(/ +/);
   const commandName = args.shift().toLowerCase();
@@ -64,6 +129,7 @@ bot.on('message', msg => {
 	 if (command.guildOnly && msg.channel.type !== 'text') {
 	 	return msg.reply('I can\'t execute that command inside DMs!');
 	 }
+   //// FIXME: make modOnly work
 	 if(command.modOnly && msg.author.id != DMNGRID){
 		 return msg.reply('This command can only be used by a moderator');
 	 }
