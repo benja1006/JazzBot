@@ -56,6 +56,9 @@ module.exports = {
         }
       }).then(Server => {
         suggestID = Server[0].Suggest;
+        if(suggestID == null){
+          return msg.reply("Suggestions are not yet enabled on this server.");
+        }
         var suggestion = args[0];
         for(i = 1; i<args.length; i++){
           suggestion = suggestion.concat(" ", args[i]);
