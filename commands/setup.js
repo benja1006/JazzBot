@@ -88,7 +88,7 @@ module.exports = {
                   Server: msg.guild.id
                 }});
                 msg.channel.send("This channel has been set as the general channel for the server.");
-                if(Server.Suggest == null){
+                if(Server[0].Suggest == null){
                   msg.channel.send("If you would like to add suggestions, please type \'" + prefix +"setup suggest\' in the channel you would like to receive suggestions.");
                 }
                 return;
