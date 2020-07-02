@@ -112,7 +112,10 @@ bot.on('message', msg => {
 
 
    //executing command
-   if (command.guildOnly && msg.channel.type !== 'text') {
+   // if (command.guildOnly && msg.channel.type !== 'text') {
+   // 	return msg.reply('I can\'t execute that command inside DMs!');
+   // }
+   if (msg.channel.type !== 'text') {
    	return msg.reply('I can\'t execute that command inside DMs!');
    }
    //// FIXME: make modOnly work
@@ -124,13 +127,10 @@ bot.on('message', msg => {
      let modRole = Server[0].ManagerRole;
      let authorID = msg.author.id;
      let guildAuthor = msg.guild.members.get(msg.author.id);
-     if(modRole == null && command.modOnly){
-       return msg.reply('This is a Mod Only Command. Please assign a modRole to use it.');
-     }
      if(guildAuthor.roles == null){
        return msg.reply('This command can only be used by a moderator.');
      }
-     if(command.modOnly && guildAuthor.roles.get(modRole) == null){
+     if(command.modOnly && modRole != null && guildAuthor.roles.get(modRole) == null){
   		 return msg.reply('This command can only be used by a moderator');
   	 }
      //Cooldowns
@@ -154,11 +154,26 @@ bot.on('message', msg => {
       setTimeout(() => timestamps.delete(msg.author.id), cooldownAmount);
 
       //command execution
-     try {
-       command.execute(msg, args);
-     } catch (error) {
-       console.error(error);
-       msg.reply('There was an error trying to execute that command!');
-     }
+      if(command.name == 'help'){
+        let isMod = false;
+        if(guildAuthor.roles.has(modRole)){
+          isMod = true;
+        }
+        try {
+          command.execute(msg, args, isMod);
+        } catch (error) {
+          console.error(error);
+          msg.reply('There was an error trying to execute that command!');
+        }
+      }
+      else{
+        try {
+          command.execute(msg, args);
+        } catch (error) {
+          console.error(error);
+          msg.reply('There was an error trying to execute that command!');
+        }
+      }
+
    });
 });

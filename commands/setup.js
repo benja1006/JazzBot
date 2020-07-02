@@ -5,6 +5,7 @@ module.exports = {
   aliases: ['setup'],
   usage: ['setup (id)'],
   cooldown: 5,
+  modOnly: true,
   execute(msg, args) {
     const SQLUSERNAME = process.env.SQLUSERNAME;
     const SQLPASSWORD = process.env.SQLPASSWORD;
@@ -66,7 +67,7 @@ module.exports = {
                   if(modRole == null){
                     return msg.channel.send("This is not a valid role id");
                   }
-                  msg.channel.send("The "+ modRole.name +" role has been given moderator priveledges");
+                  msg.channel.send("The "+ modRole.name +" role has been given moderator priveleges");
                   Servers.update({
                     ManagerRole: args[1]
                   },
