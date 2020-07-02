@@ -110,7 +110,7 @@ module.exports = {
                 return;
               }
               break;
-            case 'suggest':
+            case 'suggest' || 'suggestion' || 'suggestions':
               if(args.length == 1){
                 if(msg.channel.type != 'text'){
                   return msg.channel.send("Please use this either in the suggest channel, or followed by the id of the suggest channel");

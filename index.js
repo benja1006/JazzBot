@@ -65,7 +65,9 @@ for (const file of commandFiles) {
 
 
 //discord login
-bot.login(TOKEN);
+bot.login(TOKEN).catch(err => {
+  console.log(err);
+});
 bot.on('ready', () => {
 	bot.user.setPresence({game: {name: '!jazz'}});
 		console.info(`Logged into discord as ${bot.user.tag}!`);
@@ -140,7 +142,7 @@ bot.on('message', msg => {
       const timestamps = cooldowns.get(command.name);
       const cooldownAmount = (command.cooldown || 3) * 1000;
       //if cooldown is running and author is not mod
-      if (timestamps.has(msg.author.id) && guildAuthor.roles != null && guildAuthor.roles.find(modRole) == null) {
+      if (timestamps.has(msg.author.id) && !guildAuthor.roles.has(modRole)) {
    	    const expirationTime = timestamps.get(msg.author.id) + cooldownAmount;
 
    	     if (now < expirationTime) {
