@@ -93,13 +93,15 @@ else{
         ID: 1
       }
     }).then(env => {
-      DisToken = env[0].DisToken;
-      YTKey = env[0].YTKey;
-      SpotifyID = env[0].SpotifyID;
-      SpotifySecret = env[0].SpotifySecret;
-      const Env = [DisToken, YTKey, SpotifyID, SpotifySecret];
-      const queue = new Map();
+      // DisToken = env[0].DisToken;
+      // YTKey = env[0].YTKey;
+      // SpotifyID = env[0].SpotifyID;
+      // SpotifySecret = env[0].SpotifySecret;\
+      bot.env = env[0];
+      //const Env = [DisToken, YTKey, SpotifyID, SpotifySecret];
+      bot.queue = new Map();
       Spotify.getAccessToken(authCode, Env).then(tokenArr => {
+        bot.tokenArr = tokenArr;
         //discord setup
         const Discord = require('discord.js');
         const bot = new Discord.Client();
@@ -114,7 +116,9 @@ else{
 
 
         //discord login
-        bot.login(DisToken);
+        bot.login(DisToken).catch(err => {
+          console.log(err);
+        });
         bot.on('ready', () => {
         	bot.user.setPresence({game: {name: '!jazz'}});
         		console.info(`Logged into discord as ${bot.user.tag}!`);
@@ -160,7 +164,7 @@ else{
 
 
            //executing command
-           if (command.guildOnly && msg.channel.type !== 'text') {
+           if (msg.channel.type !== 'text') {
            	return msg.reply('I can\'t execute that command inside DMs!');
            }
            Servers.findAll({
@@ -171,13 +175,10 @@ else{
              let modRole = Server[0].ManagerRole;
              let authorID = msg.author.id;
              let guildAuthor = msg.guild.members.get(msg.author.id);
-             if(modRole == null && command.modOnly){
-               return msg.reply('This is a Mod Only Command. Please assign a modRole to use it.');
-             }
              if(guildAuthor.roles == null){
                return msg.reply('This command can only be used by a moderator.');
              }
-             if(command.modOnly && guildAuthor.roles.get(modRole) == null){
+             if(command.modOnly && modRole != null && !guildAuthor.roles.has(modRole)){
           		 return msg.reply('This command can only be used by a moderator');
           	 }
              //Cooldowns
@@ -199,38 +200,49 @@ else{
               }
               timestamps.set(msg.author.id, now);
               setTimeout(() => timestamps.delete(msg.author.id), cooldownAmount);
-
-              //test if extra info is needed
-              if(!command.extra){
-                //command execution
-                try {
-                  command.execute(msg, args, Env);
-                } catch (error) {
-                  console.error(error);
-                  msg.reply('There was an error trying to execute that command!');
-                }
+              //check if the user calling the command is a mod
+              let isMod = false;
+              if(guildAuthor.roles.has(modRole)){
+                isMod = true;
               }
-              else{
-                const serverQueue = queue.get(message.guild.id);
-                if(command.name == 'jazz' || command.name == 'replace' || command.name == 'skip' || command.name == 'stop'){
-                  Spotify.testToken(tokenArr).then(tokenArrU => {
-                    tokenArr = tokenArrU;
-                    let extra = [tokenArr, serverQueue];
-                    //command execution
-                    try {
-                      serverQueue = command.execute(msg, args, extra, Env).then(serverQueue => {
-                        if(serverQueue == null){
-                          queue.delete(msg.guild.id);
-                        }
-                      });
-
-                    } catch (error) {
-                      console.error(error);
-                      msg.reply('There was an error trying to execute that command!');
-                    }
-                  });
-                }
+              //excecute command
+              try{
+                command.execute(msg,args, isMod);
+              } catch(err){
+                console.log(err);
+                msg.reply('There was an error trying to execute that command!');
               }
+              // //test if extra info is needed
+              // if(!command.extra){
+              //   //command execution
+              //   try {
+              //     command.execute(msg, args);
+              //   } catch (error) {
+              //     console.error(error);
+              //     msg.reply('There was an error trying to execute that command!');
+              //   }
+              // }
+              // else{
+              //   const serverQueue = bot.queue.get(message.guild.id);
+              //   if(command.name == 'jazz' || command.name == 'replace' || command.name == 'skip' || command.name == 'stop'){
+              //     Spotify.testToken(tokenArr).then(tokenArrU => {
+              //       tokenArr = tokenArrU;
+              //       let extra = [tokenArr, serverQueue];
+              //       //command execution
+              //       try {
+              //         serverQueue = command.execute(msg, args, extra, Env).then(serverQueue => {
+              //           if(serverQueue == null){
+              //             queue.delete(msg.guild.id);
+              //           }
+              //         });
+              //
+              //       } catch (error) {
+              //         console.error(error);
+              //         msg.reply('There was an error trying to execute that command!');
+              //       }
+              //     });
+              //   }
+              // }
 
            });
         });

@@ -70,6 +70,10 @@ module.exports = {
           title: "Suggestion by " + msg.author.tag,
           fields: [
             {
+              name: 'UserID',
+              value: msg.author.id,
+            },
+            {
               name: 'Suggestion',
               value: suggestion,
             },

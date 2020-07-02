@@ -5,12 +5,17 @@ module.exports = {
   aliases: ['commands'],
   usage: ['command name'],
   cooldown: 5,
-  execute(msg, args) {
+  execute(msg, args, isMod) {
     const data = [];
     const { commands } = msg.client;
     if (!args.length){
       data.push('Here\'s a list of all my commands:');
-      data.push(commands.map(command => command.name).join(', '));
+      if(!isMod){
+        data.push(commands.filter(command => !command.modOnly).map(command => command.name).join(', '));
+      }
+      else{
+        data.push(commands.map(command => command.name).join(', '));
+      }
       data.push(`\nYou can send \`${prefix}help [command name]\` to get info on a specific command!`);
       if (msg.channel.type === 'text'){
         msg.delete(5000);

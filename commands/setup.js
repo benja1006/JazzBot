@@ -5,6 +5,7 @@ module.exports = {
   aliases: ['setup'],
   usage: ['setup (id)'],
   cooldown: 5,
+  modOnly: true,
   execute(msg, args) {
     const SQLUSERNAME = process.env.SQLUSERNAME;
     const SQLPASSWORD = process.env.SQLPASSWORD;
@@ -52,7 +53,7 @@ module.exports = {
         console.log(Server[0].ID);
         if(args.length == 0){
 
-            msg.channel.send("First, I need to know who should have mod priveledges on this bot.");
+            msg.channel.send("First, I need to know who should have mod priveleges on this bot.");
             msg.channel.send("Please type \'" + prefix +"setup mod\' followed by the id of the lowest role you would like to give mod priveledges for the bot.");
             return;
 
@@ -110,7 +111,7 @@ module.exports = {
                 return;
               }
               break;
-            case 'suggest':
+            case 'suggest' || 'suggestion' || 'suggestions':
               if(args.length == 1){
                 if(msg.channel.type != 'text'){
                   return msg.channel.send("Please use this either in the suggest channel, or followed by the id of the suggest channel");
