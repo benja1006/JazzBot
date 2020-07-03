@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+docker run --rm -d -t --name jazz_bot -p 49160:8080 -d jazz_bot
