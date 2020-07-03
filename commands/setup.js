@@ -6,7 +6,7 @@ module.exports = {
   usage: ['setup (id)'],
   cooldown: 5,
   modOnly: true,
-  execute(msg, args) {
+  execute(msg, args, isMod) {
     const SQLUSERNAME = process.env.SQLUSERNAME;
     const SQLPASSWORD = process.env.SQLPASSWORD;
     const prefix = process.env.PREFIX + ' ';

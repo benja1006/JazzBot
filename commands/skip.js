@@ -3,9 +3,9 @@ module.exports = {
   description: 'Skips the current song on the playlist',
   usage: [''],
   cooldown: 2,
-  execute(msg, args, extra, Env) {
-    var tokenArr = extra[0];
-    const serverQueue = extra[1];
+  execute(msg, args, isMod) {
+    var tokenArr = msg.client.tokenArr;
+    const serverQueue = msg.client.queue.get(msg.guild.id);
     if(!message.member.voice.channel){
       return msg.channel.send("You have to be in a voice channel to skip the song!");
     }
@@ -13,6 +13,5 @@ module.exports = {
       return message.channel.send("There is no song playing to skip");
     }
     serverQueue.connection.dispatcher.end();
-    return serverQueue;
   },
 }

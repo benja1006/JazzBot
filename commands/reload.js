@@ -2,9 +2,8 @@ module.exports = {
   name: 'reload',
   description: 'Reloads a command',
   usage: ['command'],
-  cooldown: 30,
   modOnly: true,
-  execute(msg, args) {
+  execute(msg, args, isMod) {
     if (!args.length) return msg.channel.send(`You didn't pass any command to reload, ${msg.author}!`);
     const commandName = args[0].toLowerCase();
     if (commandName == 'reload') return msg.channel.send('Cannot reload the \`reload\` command');

@@ -207,7 +207,7 @@ else{
               }
               //excecute command
               try{
-                command.execute(msg,args, isMod);
+                command.execute(msg, args, isMod);
               } catch(err){
                 console.log(err);
                 msg.reply('There was an error trying to execute that command!');

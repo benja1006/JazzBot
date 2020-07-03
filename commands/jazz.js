@@ -16,9 +16,9 @@ module.exports = {
   usage: ['Jazz'],
   cooldown: 5,
   extra: true,
-  execute(msg, args, extra, Env) {
-    var tokenArr = extra[0];
-    const serverQueue = extra[1];
+  execute(msg, args, isMod) {
+    var tokenArr = msg.client.tokenArr;
+    const serverQueue = msg.client.queue.get(msg.guild.id);
     //check if user is in a voice channel that supports music
     const voiceChannel = msg.member.voice.channel;
     if(!voiceChannel){
@@ -81,8 +81,7 @@ module.exports = {
         volume: 5,
         playing: true,
       };
-      //HOW DO I GET DEAL WITH THIS QUEUE?
-      queue.set(message.guild.id, queueContract);
+      msg.client.queue.set(message.guild.id, queueContract);
       //get songs from database
       Songs.sync().then(() => {
         Spotify.getSongs(tokenArr, playlistId).then(returnArr => {
@@ -125,8 +124,8 @@ module.exports = {
                 play(message.guild, queueContract.songs[0]);
               } catch (err) {
                 console.log(err);
-                queue.delete(message.guild.id);
-                return message.channel.send(err);
+                msg.client.queue.delete(msg.guild.id);
+                return msg.channel.send(err);
               }
             });
           }

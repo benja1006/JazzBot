@@ -8,7 +8,7 @@ module.exports = {
   cooldown: 300,
   guildOnly: true,
   modOnly: false,
-  execute(msg, args) {
+  execute(msg, args, isMod) {
     if(args.length == 0){
       return msg.author.send("Please include a message in your suggestion");
     }
@@ -79,6 +79,9 @@ module.exports = {
             },
           ],
         };
+        if(isMod){
+          suggestionEmbed.color = 0xde2121;
+        }
         msg.guild.channels.get(suggestID).send({ embed: suggestionEmbed});
       });
     });
