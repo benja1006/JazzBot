@@ -1,9 +1,9 @@
 const fs = require('fs');
-const Youtube = require('./youtube');
-const Spotify = require('./spotify');
-const ytdl = require('ytdl');
+const ytdl = require('ytdl-core');
+const Youtube = require('../youtube');
+const Spotify = require('../spotify');
 function shuffle(array){
-  for (let i = array.length -1 1; i>0, i--){
+  for (let i = array.length -1; i>0; i--){
     let j = Math.floor(Math.random() * (i+1));
     [array[i], array[j]] = [array[j], array[i]];
   }
@@ -93,7 +93,7 @@ module.exports = {
             */
             Songs.find({
               where: {
-                SpotID = items[i].id;
+                SpotID: items[i].id
               }
             }).then(async function(song) {
               if(song == null){
@@ -106,26 +106,26 @@ module.exports = {
                 let url = 'https://www.youtube.com/watch?v=' + songResource.id.videoId;
               }
               else{
-                if(!song.Include){
-                  continue;
-                }
                 let url = 'https://www.youtube.com/watch?v=' + song.YTID;
               }
-              //url of song has been found. It has also been added to database if not already there.
-              const songInfo = await ytdl.getInfo(url);
-              const song = {
-                title: songInfo.title,
-                url: songInfo.video_url
-              };
-              queueContract.songs.push(song);
-              try{
-                var connection = await voiceChannel.join();
-                queueContract.connection = connection;
-                play(message.guild, queueContract.songs[0]);
-              } catch (err) {
-                console.log(err);
-                msg.client.queue.delete(msg.guild.id);
-                return msg.channel.send(err);
+              //if the song shouldn't be included. Don't do anything else
+              if(song.Include){
+                //url of song has been found. It has also been added to database if not already there.
+                const songInfo = await ytdl.getInfo(url);
+                const song = {
+                  title: songInfo.title,
+                  url: songInfo.video_url
+                };
+                queueContract.songs.push(song);
+                try{
+                  var connection = await voiceChannel.join();
+                  queueContract.connection = connection;
+                  play(message.guild, queueContract.songs[0]);
+                } catch (err) {
+                  console.log(err);
+                  msg.client.queue.delete(msg.guild.id);
+                  return msg.channel.send(err);
+                }
               }
             });
           }

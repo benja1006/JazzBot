@@ -14,7 +14,7 @@ module.exports = {
       open(res.request.res.responseUrl);
     });
   },
-  getAccessToken: async function(authCode, Env){
+  getAccessToken: async function(authCode, env){
     const requestBody = {
       grant_type: 'authorization_code',
       code: authCode,
@@ -26,7 +26,7 @@ module.exports = {
         'Content-Type': 'application/x-www-form-urlencoded',
       }
     }
-    let data = Env[3] + Env[4];
+    let data = env.SpotifyID + ':' + env.SpotifySecret;
     let buff = new Buffer.from(data);
     let base64data = buff.toString('base64');
     config.headers['Authorization'] = 'Basic ' + base64data;

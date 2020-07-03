@@ -7,7 +7,6 @@ var myArgs = process.argv.slice(2);
 var tokenArr = [];
 const Youtube = require('./youtube');
 const Spotify = require('./spotify');
-const fs = require('fs');
 if(myArgs.length == 0){
   Spotify.getAuthCode();
 }
@@ -96,18 +95,19 @@ else{
       // DisToken = env[0].DisToken;
       // YTKey = env[0].YTKey;
       // SpotifyID = env[0].SpotifyID;
-      // SpotifySecret = env[0].SpotifySecret;\
-      bot.env = env[0];
-      //const Env = [DisToken, YTKey, SpotifyID, SpotifySecret];
-      bot.queue = new Map();
-      Spotify.getAccessToken(authCode, Env).then(tokenArr => {
-        bot.tokenArr = tokenArr;
+      // SpotifySecret = env[0].SpotifySecret;
+
+      Spotify.getAccessToken(authCode, env[0]).then(tokenArr => {
+
         //discord setup
         const Discord = require('discord.js');
         const bot = new Discord.Client();
         const cooldowns = new Discord.Collection();
         const prefix = process.env.PREFIX + ' ';
         bot.commands = new Discord.Collection();
+        bot.tokenArr = tokenArr;
+        bot.env = env[0];
+        bot.queue = new Map();
         const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
         for (const file of commandFiles) {
         	const command = require(`./commands/${file}`);
@@ -116,7 +116,7 @@ else{
 
 
         //discord login
-        bot.login(DisToken).catch(err => {
+        bot.login(bot.env.DisToken).catch(err => {
           console.log(err);
         });
         bot.on('ready', () => {

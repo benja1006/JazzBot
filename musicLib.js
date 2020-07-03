@@ -1,3 +1,4 @@
+const ytdl = require('ytdl');
 module.exports = {
   function play(guild, song) {
     const queue = guil.client.queue;
@@ -9,7 +10,7 @@ module.exports = {
     }
 
     const dispatcher = serverQueue.connection
-      .play(ytld(song.url))
+      .play(ytdl(song.url))
       .on("finish", () => {
         serverQueue.songs.shift();
         play(guild,serverQueue.songs[0]);

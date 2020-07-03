@@ -20,7 +20,8 @@
     "steam-tradeoffer-manager": "^2.10.2",
     "steam-user": "^4.15.3",
     "steam-web": "^0.7.0",
-    "steamcommunity": "^3.41.3"
+    "steamcommunity": "^3.41.3",
+    "ytdl": "^1.3.2"
   },
   "devDependencies": {},
   "scripts": {
