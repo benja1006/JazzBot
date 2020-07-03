@@ -96,6 +96,10 @@ bot.on('guildCreate', guild => {
   defaultChannel.send('Hello! Thank you for adding JazzBot to your server. Please type \'!jazz Setup\' in a channel on this server to begin the setup process.');
   bot.users.get('134454672378298370').send('Jazzbot has joined '+ guild.name);
 });
+
+bot.on('error', err => {
+  console.log(err);
+});
 bot.on('message', msg => {
   if (!msg.content.startsWith(prefix) || msg.author.bot) return;
 	//back to normal command code
