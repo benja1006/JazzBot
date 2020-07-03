@@ -5,6 +5,7 @@ module.exports = {
   aliases: ['commands'],
   usage: ['command name'],
   cooldown: 5,
+  reqMusic: false,
   execute(msg, args, isMod) {
     const data = [];
     const { commands } = msg.client;
@@ -18,7 +19,7 @@ module.exports = {
       }
       data.push(`\nYou can send \`${prefix}help [command name]\` to get info on a specific command!`);
       if (msg.channel.type === 'text'){
-        msg.delete(5000);
+        msg.delete();
       }
       msg.author.send(data, { split: true })
 	    .then(() => {
@@ -36,7 +37,7 @@ module.exports = {
 
     if (!command) {
       if (msg.channel.type === 'text'){
-        msg.delete(5000);
+        msg.delete();
       }
         return msg => msg.channel.send('that\'s not a valid command!');
       }

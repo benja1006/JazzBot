@@ -2,6 +2,7 @@ const fs = require('fs');
 const ytdl = require('ytdl-core');
 const Youtube = require('../youtube');
 const Spotify = require('../spotify');
+const musicLib = require('../musicLib');
 function shuffle(array){
   for (let i = array.length -1; i>0; i--){
     let j = Math.floor(Math.random() * (i+1));
@@ -15,18 +16,18 @@ module.exports = {
   aliases: ['Play'],
   usage: ['Jazz'],
   cooldown: 5,
-  extra: true,
+  reqMusic: true,
   execute(msg, args, isMod) {
     var tokenArr = msg.client.tokenArr;
     const serverQueue = msg.client.queue.get(msg.guild.id);
     //check if user is in a voice channel that supports music
-    const voiceChannel = msg.member.voice.channel;
-    if(!voiceChannel){
-      return message.channel.send("You must be in a voice channel to use this command.");
+    if(!msg.member.voice.channel){
+      return msg.channel.send("You must be in a voice channel to use this command.");
     }
-    const permissions = voiceChannel.permissionsFor(message.client.user);
+    const voiceChannel = msg.member.voice.channel;
+    const permissions = voiceChannel.permissionsFor(msg.client.user);
     if(!permissions.has("CONNECT") || !permissions.has("SPEAK")) {
-      return message.channel.send("I need permission to join and speak in the voice channel.");
+      return msg.channel.send("I need permission to join and speak in the voice channel.");
     }
     //connect to database to get song url's
     const SQLUSERNAME = process.env.SQLUSERNAME;
@@ -81,46 +82,49 @@ module.exports = {
         volume: 5,
         playing: true,
       };
-      msg.client.queue.set(message.guild.id, queueContract);
+      msg.client.queue.set(msg.guild.id, queueContract);
       //get songs from database
-      Songs.sync().then(() => {
-        Spotify.getSongs(tokenArr, playlistId).then(returnArr => {
+      console.log('about to get songs.');
+      Songs.sync({force: true}).then(() => {
+        Spotify.getSongs(tokenArr, playlistId).then(async function(returnArr){
+          console.log('getSongs has ran');
+
           let items = returnArr[1];
+          console.log(items[0]);
           items = shuffle(items);
+          console.log(items[0]);
           for(let i = 0; i < items.length; i++){
             /* for each item if the database has a link, procede with normal playback
             if the database has no link, look up the song with youtube
             */
-            Songs.find({
+            await Songs.findOne({
               where: {
-                SpotID: items[i].id
+                SpotID: items[i].track.id
               }
             }).then(async function(song) {
-              if(song == null){
+              if(!song){
                 //lookup song on youtube
-                let songResource = await Youtube.lookup(items[i].name, item[i].artists[0].name);//name, artist
-                Songs.create({
-                  SpotID: item[i].id,
+                let songResource = await Youtube.lookup(items[i].track.name, items[i].track.artists[0].name);//name, artist
+                song = await Songs.create({
+                  SpotID: items[i].track.id,
                   YTID: songResource.id.videoId
                 });
-                let url = 'https://www.youtube.com/watch?v=' + songResource.id.videoId;
               }
-              else{
-                let url = 'https://www.youtube.com/watch?v=' + song.YTID;
-              }
+
+              let url = 'https://www.youtube.com/watch?v=' + song.YTID;
               //if the song shouldn't be included. Don't do anything else
               if(song.Include){
                 //url of song has been found. It has also been added to database if not already there.
                 const songInfo = await ytdl.getInfo(url);
                 const song = {
-                  title: songInfo.title,
-                  url: songInfo.video_url
+                  title: songInfo.videoDetails.title,
+                  url: songInfo.videoDetails.video_url
                 };
                 queueContract.songs.push(song);
                 try{
                   var connection = await voiceChannel.join();
                   queueContract.connection = connection;
-                  play(message.guild, queueContract.songs[0]);
+                  musicLib.play(msg.guild, queueContract.songs[0]);
                 } catch (err) {
                   console.log(err);
                   msg.client.queue.delete(msg.guild.id);

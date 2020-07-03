@@ -3,6 +3,7 @@ module.exports = {
   description: 'Skips the current song on the playlist',
   usage: [''],
   cooldown: 2,
+  reqMusic: true,
   execute(msg, args, isMod) {
     var tokenArr = msg.client.tokenArr;
     const serverQueue = msg.client.queue.get(msg.guild.id);

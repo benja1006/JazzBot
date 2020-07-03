@@ -1,7 +1,8 @@
-const ytdl = require('ytdl');
+const ytdl = require('ytdl-core');
+require('ffmpeg-binaries');
 module.exports = {
-  function play(guild, song) {
-    const queue = guil.client.queue;
+  play: function(guild, song) {
+    const queue = guild.client.queue;
     const serverQueue = guild.client.queue.get(guild.id);
     if(!song){
       serverQueue.voiceChannel.leave();

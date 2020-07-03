@@ -3,6 +3,7 @@ module.exports = {
   description: 'Removes the song from the list',
   usage: [''],
   cooldown: 10,
+  reqMusic: true,
   execute(msg, args, isMod) {
     var tokenArr = msg.client.tokenArr;
     const serverQueue = msg.client.queue.get(msg.guild.id);

@@ -3,6 +3,7 @@ module.exports = {
   description: 'Reloads a command',
   usage: ['command'],
   modOnly: true,
+  reqMusic: true,
   execute(msg, args, isMod) {
     if (!args.length) return msg.channel.send(`You didn't pass any command to reload, ${msg.author}!`);
     const commandName = args[0].toLowerCase();

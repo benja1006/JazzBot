@@ -54,6 +54,9 @@ else{
     ManagerRole: {
       type: Sequelize.BIGINT(18),
       autoIncrement: false
+    },
+    Music: {
+      type: Sequelize.BOOLEAN,
     }
   }, {
     sequelize,
@@ -124,6 +127,9 @@ else{
         		console.info(`Logged into discord as ${bot.user.tag}!`);
             //const defaultChannel = bot.channels.get(process.env.DEFAULT);
         });
+        bot.on('error', err => {
+          console.log(err);
+        });
 
         //When added to a new server
         bot.on('guildCreate', guild => {
@@ -174,11 +180,9 @@ else{
            }).then(Server => {
              let modRole = Server[0].ManagerRole;
              let authorID = msg.author.id;
-             let guildAuthor = msg.guild.members.get(msg.author.id);
-             if(guildAuthor.roles == null){
-               return msg.reply('This command can only be used by a moderator.');
-             }
-             if(command.modOnly && modRole != null && !guildAuthor.roles.has(modRole)){
+             let guildAuthor = msg.member;
+             let musicEnabled = Server[0].Music;
+             if(command.modOnly && modRole != null && !guildAuthor.roles.cache.has(modRole)){
           		 return msg.reply('This command can only be used by a moderator');
           	 }
              //Cooldowns
@@ -190,7 +194,7 @@ else{
               const timestamps = cooldowns.get(command.name);
               const cooldownAmount = (command.cooldown || 3) * 1000;
               //if cooldown is running and author is not mod
-              if (timestamps.has(msg.author.id) && guildAuthor.roles != null && guildAuthor.roles.find(modRole) == null) {
+              if (timestamps.has(msg.author.id) && guildAuthor.roles != null && !guildAuthor.roles.cache.has(modRole)) {
            	    const expirationTime = timestamps.get(msg.author.id) + cooldownAmount;
 
            	     if (now < expirationTime) {
@@ -202,7 +206,7 @@ else{
               setTimeout(() => timestamps.delete(msg.author.id), cooldownAmount);
               //check if the user calling the command is a mod
               let isMod = false;
-              if(guildAuthor.roles.has(modRole)){
+              if(guildAuthor.roles.cache.has(modRole)){
                 isMod = true;
               }
               //excecute command
