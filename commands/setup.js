@@ -12,7 +12,7 @@ module.exports = {
     const prefix = process.env.PREFIX + ' ';
     const Sequelize = require('sequelize');
     const sequelize = new Sequelize('jazzbot', SQLUSERNAME, SQLPASSWORD, {
-      host: 'localhost',
+      host: 'mysql',
       dialect: 'mysql'
     });
     const Model = Sequelize.Model;
@@ -44,7 +44,7 @@ module.exports = {
       modelName: 'Servers'
     });
 
-    Servers.sync().then(() => {
+    Servers.sync({force: true}).then(() => {
       Servers.findAll({
         where: {
           Server: msg.guild.id
