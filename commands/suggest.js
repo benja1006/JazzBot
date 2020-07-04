@@ -79,7 +79,7 @@ module.exports = {
             },
           ],
         };
-        msg.guild.channels.get(suggestID).send({ embed: suggestionEmbed});
+        msg.guild.channels.cache.get(suggestID).send({ embed: suggestionEmbed});
       });
     });
 

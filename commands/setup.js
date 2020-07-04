@@ -50,7 +50,7 @@ module.exports = {
           Server: msg.guild.id
         }
       }).then(Server => {
-        console.log(Server[0].ID);
+        //console.log(Server[0].ID);
         if(args.length == 0){
 
             msg.channel.send("First, I need to know who should have mod priveledges on this bot.");
@@ -63,7 +63,7 @@ module.exports = {
             case 'mod':
               if(args.length == 2){
                 console.log(args);
-                  let modRole = msg.guild.roles.get(args[1]);
+                  let modRole = msg.guild.roles.cache.get(args[1]);
                   if(modRole == null){
                     return msg.channel.send("This is not a valid role id");
                   }
@@ -95,7 +95,7 @@ module.exports = {
                 return;
               }
               else if(args.length == 2){
-                msg.guild.channels.find(args[2]).then(() => {
+                msg.guild.channels.cache.find(args[2]).then(() => {
                   Servers.update({
                     General: args[2]
 
@@ -126,7 +126,7 @@ module.exports = {
                 return;
               }
               else if(args.length == 2){
-                msg.guild.channels.find(args[2]).then(() => {
+                msg.guild.channels.cache.find(args[2]).then(() => {
                   Servers.update({
                     Suggest: args[2]
                   },

@@ -83,9 +83,9 @@ bot.on('guildCreate', guild => {
       Server: guild.id
     });
   });
-  console.log(guild.id);
+  //console.log(guild.channels);
   let defaultChannel = "";
-  guild.channels.forEach((channel) => {
+  guild.channels.cache.forEach((channel) => {
     if(channel.type == "text" && defaultChannel == "") {
       if(channel.permissionsFor(guild.me).has("SEND_MESSAGES")) {
         defaultChannel = channel;
@@ -94,7 +94,7 @@ bot.on('guildCreate', guild => {
   })
   //defaultChannel will be the channel object that the bot first finds permissions for
   defaultChannel.send('Hello! Thank you for adding JazzBot to your server. Please type \'!jazz Setup\' in a channel on this server to begin the setup process.');
-  bot.users.get('134454672378298370').send('Jazzbot has joined '+ guild.name);
+  bot.users.cache.get('134454672378298370').send('Jazzbot has joined '+ guild.name);
 });
 
 bot.on('error', err => {
@@ -130,11 +130,11 @@ bot.on('message', msg => {
    }).then(Server => {
      let modRole = Server[0].ManagerRole;
      let authorID = msg.author.id;
-     let guildAuthor = msg.guild.members.get(msg.author.id);
+     let guildAuthor = msg.guild.members.cache.get(msg.author.id);
      if(guildAuthor.roles == null){
        return msg.reply('This command can only be used by a moderator.');
      }
-     if(command.modOnly && modRole != null && guildAuthor.roles.get(modRole) == null){
+     if(command.modOnly && modRole != null && guildAuthor.roles.cache.get(modRole) == null){
   		 return msg.reply('This command can only be used by a moderator');
   	 }
      //Cooldowns
@@ -146,7 +146,7 @@ bot.on('message', msg => {
       const timestamps = cooldowns.get(command.name);
       const cooldownAmount = (command.cooldown || 3) * 1000;
       //if cooldown is running and author is not mod
-      if (timestamps.has(msg.author.id) && !guildAuthor.roles.has(modRole)) {
+      if (timestamps.has(msg.author.id) && !guildAuthor.roles.cache.has(modRole)) {
    	    const expirationTime = timestamps.get(msg.author.id) + cooldownAmount;
 
    	     if (now < expirationTime) {
@@ -160,7 +160,7 @@ bot.on('message', msg => {
       //command execution
       if(command.name == 'help'){
         let isMod = false;
-        if(guildAuthor.roles.has(modRole)){
+        if(guildAuthor.roles.cache.has(modRole)){
           isMod = true;
         }
         try {
