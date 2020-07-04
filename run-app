@@ -1,4 +1,3 @@
 #!/usr/bin/env bash
 
-docker run --rm -d -t --name jazz_bot -p 49160:8080 -d jazz_bot
-docker run -d --network testnetwork --network-alias mysql -v test-mysql-data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=null -e MYSQL_DATABASE=jazzbot mysql:latest
+docker run --rm -d -it -w /app -v ${PWD}:/app --network jazzbot_jazz_bot --name jazz_bot_app jazz_bot
