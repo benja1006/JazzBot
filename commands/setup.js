@@ -44,7 +44,7 @@ module.exports = {
       modelName: 'Servers'
     });
 
-    Servers.sync({force: true}).then(() => {
+    Servers.sync().then(() => {
       Servers.findAll({
         where: {
           Server: msg.guild.id

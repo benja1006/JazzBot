@@ -78,7 +78,7 @@ bot.on('ready', () => {
 bot.on('guildCreate', guild => {
   //Start mysql connection
 	 //add server to mysql table
-  Servers.sync({force: true}).then(() => {
+  Servers.sync().then(() => {
     Servers.create({
       Server: guild.id
     });
