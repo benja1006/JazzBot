@@ -18,7 +18,7 @@ module.exports = {
     const SQLPASSWORD = process.env.SQLPASSWORD;
     const Model = Sequelize.Model;
     const sequelize = new Sequelize('jazzbot', SQLUSERNAME, SQLPASSWORD, {
-      host: 'localhost',
+      host: 'mysql',
       dialect: 'mysql'
     });
     //create Server model
@@ -49,7 +49,7 @@ module.exports = {
       sequelize,
       modelName: 'Servers'
     });
-    Servers.sync().then(() => {
+    Servers.sync({force: true}).then(() => {
       Servers.findAll({
         where: {
           Server: msg.guild.id
