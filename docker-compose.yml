@@ -12,8 +12,8 @@ services:
     volumes:
       - ./mysql:/var/lib/mysql
     environment:
-      MYSQL_ROOT_PASSWORD: null
-      MYSQL_DATABASE: jazzbot
+      - MYSQL_ROOT_PASSWORD=null
+      - MYSQL_DATABASE=jazzbot
     ports:
       - "3306:3306"
     cap_add:
