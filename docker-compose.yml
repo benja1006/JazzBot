@@ -1,0 +1,21 @@
+version: "3.8"
+services:
+  jazzbot:
+    image: node:12
+    command: bash -c "npm install && node index.js"
+    working_dir: /app
+    volumes:
+      - ./:/app
+  mysql:
+    image: mysql:latest
+    volumes:
+      - jazzbot-mysql-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: null
+      MYSQL_DATABASE: jazzbot
+    ports:
+      - "3306:3306"
+volumes:
+  jazzbot-mysql-data:
+network:
+  jazzbot:
