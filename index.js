@@ -69,7 +69,7 @@ bot.login(TOKEN).catch(err => {
   console.log(err);
 });
 bot.on('ready', () => {
-	bot.user.setPresence({game: {name: '!jazz'}});
+	bot.user.setPresence({activity: {name: '!jazz'}});
 		console.info(`Logged into discord as ${bot.user.tag}!`);
     //const defaultChannel = bot.channels.get(process.env.DEFAULT);
 });
@@ -123,61 +123,62 @@ bot.on('message', msg => {
    	return msg.reply('I can\'t execute that command inside DMs!');
    }
    //// FIXME: make modOnly work
-   Servers.findAll({
-     where: {
-       Server: msg.guild.id
-     }
-   }).then(Server => {
-     let modRole = Server[0].ManagerRole;
-     let authorID = msg.author.id;
-     let guildAuthor = msg.guild.members.cache.get(msg.author.id);
-     if(guildAuthor.roles == null){
-       return msg.reply('This command can only be used by a moderator.');
-     }
-     if(command.modOnly && modRole != null && guildAuthor.roles.cache.get(modRole) == null){
-  		 return msg.reply('This command can only be used by a moderator');
-  	 }
-     //Cooldowns
-     if (!cooldowns.has(command.name)) {
-   	   cooldowns.set(command.name, new Discord.Collection());
-      }
-
-      const now = Date.now();
-      const timestamps = cooldowns.get(command.name);
-      const cooldownAmount = (command.cooldown || 3) * 1000;
-      //if cooldown is running and author is not mod
-      if (timestamps.has(msg.author.id) && !guildAuthor.roles.cache.has(modRole)) {
-   	    const expirationTime = timestamps.get(msg.author.id) + cooldownAmount;
-
-   	     if (now < expirationTime) {
-   		       const timeLeft = (expirationTime - now) / 1000;
-   		       return msg.reply(`please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`);
-   	     }
-      }
-      timestamps.set(msg.author.id, now);
-      setTimeout(() => timestamps.delete(msg.author.id), cooldownAmount);
-
-      //command execution
-      if(command.name == 'help'){
-        let isMod = false;
-        if(guildAuthor.roles.cache.has(modRole)){
-          isMod = true;
+   Servers.sync().then(() => {
+     Servers.findAll({
+       where: {
+         Server: msg.guild.id
+       }
+     }).then(Server => {
+       let modRole = Server[0].ManagerRole;
+       let authorID = msg.author.id;
+       let guildAuthor = msg.guild.members.cache.get(msg.author.id);
+       if(guildAuthor.roles == null){
+         return msg.reply('This command can only be used by a moderator.');
+       }
+       if(command.modOnly && modRole != null && guildAuthor.roles.cache.get(modRole) == null){
+    		 return msg.reply('This command can only be used by a moderator');
+    	 }
+       //Cooldowns
+       if (!cooldowns.has(command.name)) {
+     	   cooldowns.set(command.name, new Discord.Collection());
         }
-        try {
-          command.execute(msg, args, isMod);
-        } catch (error) {
-          console.error(error);
-          msg.reply('There was an error trying to execute that command!');
-        }
-      }
-      else{
-        try {
-          command.execute(msg, args);
-        } catch (error) {
-          console.error(error);
-          msg.reply('There was an error trying to execute that command!');
-        }
-      }
 
+        const now = Date.now();
+        const timestamps = cooldowns.get(command.name);
+        const cooldownAmount = (command.cooldown || 3) * 1000;
+        //if cooldown is running and author is not mod
+        if (timestamps.has(msg.author.id) && !guildAuthor.roles.cache.has(modRole)) {
+     	    const expirationTime = timestamps.get(msg.author.id) + cooldownAmount;
+
+     	     if (now < expirationTime) {
+     		       const timeLeft = (expirationTime - now) / 1000;
+     		       return msg.reply(`please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`);
+     	     }
+        }
+        timestamps.set(msg.author.id, now);
+        setTimeout(() => timestamps.delete(msg.author.id), cooldownAmount);
+
+        //command execution
+        if(command.name == 'help'){
+          let isMod = false;
+          if(guildAuthor.roles.cache.has(modRole)){
+            isMod = true;
+          }
+          try {
+            command.execute(msg, args, isMod);
+          } catch (error) {
+            console.error(error);
+            msg.reply('There was an error trying to execute that command!');
+          }
+        }
+        else{
+          try {
+            command.execute(msg, args);
+          } catch (error) {
+            console.error(error);
+            msg.reply('There was an error trying to execute that command!');
+          }
+        }
+     });
    });
 });
