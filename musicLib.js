@@ -1,5 +1,4 @@
-const ytdl = require('ytdl-core');
-require('ffmpeg-binaries');
+const ytdl = require('ytdl-core-discord');
 module.exports = {
   play: function(guild, song) {
     const queue = guild.client.queue;

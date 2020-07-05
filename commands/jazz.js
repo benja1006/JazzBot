@@ -19,12 +19,15 @@ module.exports = {
   reqMusic: true,
   execute(msg, args, isMod) {
     var tokenArr = msg.client.tokenArr;
+    let guildAuthor = msg.guild.members.cache.get(msg.author.id);
+    //let guildAuthor = msg.member;
+    console.log(guildAuthor);
     const serverQueue = msg.client.queue.get(msg.guild.id);
     //check if user is in a voice channel that supports music
-    if(!msg.member.voice.channel){
+    if(!guildAuthor.voice.channel){
       return msg.channel.send("You must be in a voice channel to use this command.");
     }
-    const voiceChannel = msg.member.voice.channel;
+    const voiceChannel = guildAuthor.voice.channel;
     const permissions = voiceChannel.permissionsFor(msg.client.user);
     if(!permissions.has("CONNECT") || !permissions.has("SPEAK")) {
       return msg.channel.send("I need permission to join and speak in the voice channel.");

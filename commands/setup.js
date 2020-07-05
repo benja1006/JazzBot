@@ -67,7 +67,7 @@ module.exports = {
             case 'mod':
               if(args.length == 2){
                 console.log(args);
-                  let modRole = msg.guild.roles.get(args[1]);
+                  let modRole = msg.guild.roles.cache.get(args[1]);
                   if(modRole == null){
                     return msg.channel.send("This is not a valid role id");
                   }
@@ -99,7 +99,7 @@ module.exports = {
                 return;
               }
               else if(args.length == 2){
-                msg.guild.channels.find(args[2]).then(() => {
+                msg.guild.channels.cache.find(args[2]).then(() => {
                   Servers.update({
                     General: args[2]
 
@@ -115,7 +115,9 @@ module.exports = {
                 return;
               }
               break;
-            case 'suggest' || 'suggestion' || 'suggestions':
+            case 'suggestion':
+            case 'suggestions':
+            case 'suggest':
               if(args.length == 1){
                 if(msg.channel.type != 'text'){
                   return msg.channel.send("Please use this either in the suggest channel, or followed by the id of the suggest channel");
@@ -130,7 +132,7 @@ module.exports = {
                 return;
               }
               else if(args.length == 2){
-                msg.guild.channels.find(args[2]).then(() => {
+                msg.guild.channels.cache.find(args[2]).then(() => {
                   Servers.update({
                     Suggest: args[2]
                   },
@@ -140,6 +142,47 @@ module.exports = {
                   msg.channel.send("You have updated the suggest channel for the server.")
                 }).catch(msg.channel.send("This is not a valid channel id"));
                 return;
+              }
+            case 'togglemusic':
+            case 'allowmusic':
+            case 'music':
+              console.log('running case music');
+              let newMusic = false;
+              if(args.length == 1){
+                if(!Server[0].Music){
+                  newMusic = true;
+                }
+              }
+              if(args.length == 2){
+                if(JSON.parse(args[1])){
+                  if(Server[0].Music){
+                    msg.channel.send('Music is already enabled on this server.');
+                    newMusic = true;
+                  }
+                  else{
+                    msg.channel.send('Music has been enabled on this server.');
+                    newMusic = true;
+                  }
+                }
+                if(!JSON.parse(args[1])){
+                  if(!Server[0].Music){
+                    msg.channel.send('Music is already disabled on this server.');
+                  }
+                  else{
+                    msg.channel.send('Music has been disabled on this server.');
+                  }
+                }
+                else{
+                  msg.channel.send('Please only include either true or false or neither to switch the current setting.');
+                }
+              }
+              if(newMusic != Server[0].Music){
+                Servers.update({
+                  Music: newMusic
+                },
+                { where: {
+                  Server: msg.guild.id
+                }}).then(() => console.log('Music has been updated'));
               }
           }
         }
