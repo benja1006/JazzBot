@@ -83,7 +83,7 @@ BotEnv.init({
   modelName: 'BotEnv'
 });
 BotEnv.sync().then(() => {
-  BotEnv.findAll({
+  BotEnv.findOne({
     where: {
       ID: 1
     }
@@ -98,7 +98,7 @@ BotEnv.sync().then(() => {
     const cooldowns = new Discord.Collection();
     const prefix = process.env.PREFIX + ' ';
     bot.commands = new Discord.Collection();
-    bot.env = env[0];
+    bot.env = env;
     bot.queue = new Map();
     const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
     for (const file of commandFiles) {
@@ -143,10 +143,10 @@ BotEnv.sync().then(() => {
       bot.users.get('134454672378298370').send('Jazzbot has joined '+ guild.name);
     });
     bot.on('message', msg => {
-      if(msg.author.id = '134454672378298370' && msg.channel.type == 'dm' && !authCode && !bot.authToken){
+      if(msg.author.id == '134454672378298370' && msg.channel.type == 'dm' && !authCode && !bot.authToken){
         authCode = msg.content;
         msg.channel.send('Spotify Auth code added');
-        bot.authToken = Spotify.getAccessToken(authCode, env[0]).then(() => {
+        bot.authToken = Spotify.getAccessToken(authCode, env).then(() => {
           console.log('Logged into Spotify');
         }).catch(err => console.error(err));
       }
@@ -160,7 +160,6 @@ BotEnv.sync().then(() => {
         msg.author.send(`That command doesn't exist. try ${prefix}help for help`)
         return;
       }
-      console.log(msg.member);
       //cooldown code
       const command = bot.commands.get(commandName);
 
@@ -176,7 +175,7 @@ BotEnv.sync().then(() => {
        }).then(Server => {
          let modRole = Server[0].ManagerRole;
          let authorID = msg.author.id;
-         let guildAuthor = msg.guild.members.cache.get('msg.author.id');
+         let guildAuthor = msg.member;
          // let guildAuthor = msg.member;
          let musicEnabled = Server[0].Music;
          if(command.modOnly && modRole != null && !guildAuthor.roles.cache.has(modRole)){
@@ -210,7 +209,7 @@ BotEnv.sync().then(() => {
           setTimeout(() => timestamps.delete(msg.author.id), cooldownAmount);
           //check if the user calling the command is a mod
           let isMod = false;
-          if(msg.member.roles.cache.has(modRole)){
+          if(guildAuthor.roles.cache.has(modRole)){
             isMod = true;
           }
           let allowMusic = Server[0].Music;
