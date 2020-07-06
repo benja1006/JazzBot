@@ -121,8 +121,8 @@ module.exports = {
                 //url of song has been found. It has also been added to database if not already there.
                 const songInfo = await ytdl.getInfo(url);
                 const song = {
-                  title: songInfo.videoDetails.title,
-                  url: songInfo.videoDetails.video_url
+                  title: songInfo.playerResponse.videoDetails.title,
+                  url: url
                 };
                 console.log('i is ' + i);
                 if(i == 0){
