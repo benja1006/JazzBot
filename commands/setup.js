@@ -6,7 +6,8 @@ module.exports = {
   usage: ['setup (id)'],
   cooldown: 5,
   modOnly: true,
-  execute(msg, args) {
+  reqMusic: false,
+  execute(msg, args, isMod) {
     const SQLUSERNAME = process.env.SQLUSERNAME;
     const SQLPASSWORD = process.env.SQLPASSWORD;
     const prefix = process.env.PREFIX + ' ';
@@ -38,6 +39,9 @@ module.exports = {
       ManagerRole: {
         type: Sequelize.BIGINT(18),
         autoIncrement: false
+      },
+      Music: {
+        type: Sequelize.BOOLEAN,
       }
     }, {
       sequelize,
@@ -53,7 +57,7 @@ module.exports = {
         //console.log(Server[0].ID);
         if(args.length == 0){
 
-            msg.channel.send("First, I need to know who should have mod priveledges on this bot.");
+            msg.channel.send("First, I need to know who should have mod priveleges on this bot.");
             msg.channel.send("Please type \'" + prefix +"setup mod\' followed by the id of the lowest role you would like to give mod priveledges for the bot.");
             return;
 
@@ -89,7 +93,7 @@ module.exports = {
                   Server: msg.guild.id
                 }});
                 msg.channel.send("This channel has been set as the general channel for the server.");
-                if(Server.Suggest == null){
+                if(Server[0].Suggest == null){
                   msg.channel.send("If you would like to add suggestions, please type \'" + prefix +"setup suggest\' in the channel you would like to receive suggestions.");
                 }
                 return;
@@ -111,7 +115,9 @@ module.exports = {
                 return;
               }
               break;
-            case 'suggest' || 'suggestion' || 'suggestions':
+            case 'suggestion':
+            case 'suggestions':
+            case 'suggest':
               if(args.length == 1){
                 if(msg.channel.type != 'text'){
                   return msg.channel.send("Please use this either in the suggest channel, or followed by the id of the suggest channel");
@@ -136,6 +142,47 @@ module.exports = {
                   msg.channel.send("You have updated the suggest channel for the server.")
                 }).catch(msg.channel.send("This is not a valid channel id"));
                 return;
+              }
+            case 'togglemusic':
+            case 'allowmusic':
+            case 'music':
+              console.log('running case music');
+              let newMusic = false;
+              if(args.length == 1){
+                if(!Server[0].Music){
+                  newMusic = true;
+                }
+              }
+              if(args.length == 2){
+                if(JSON.parse(args[1])){
+                  if(Server[0].Music){
+                    msg.channel.send('Music is already enabled on this server.');
+                    newMusic = true;
+                  }
+                  else{
+                    msg.channel.send('Music has been enabled on this server.');
+                    newMusic = true;
+                  }
+                }
+                if(!JSON.parse(args[1])){
+                  if(!Server[0].Music){
+                    msg.channel.send('Music is already disabled on this server.');
+                  }
+                  else{
+                    msg.channel.send('Music has been disabled on this server.');
+                  }
+                }
+                else{
+                  msg.channel.send('Please only include either true or false or neither to switch the current setting.');
+                }
+              }
+              if(newMusic != Server[0].Music){
+                Servers.update({
+                  Music: newMusic
+                },
+                { where: {
+                  Server: msg.guild.id
+                }}).then(() => console.log('Music has been updated'));
               }
           }
         }
