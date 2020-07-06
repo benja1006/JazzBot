@@ -172,7 +172,7 @@ module.exports = {
                     msg.channel.send('Music has been disabled on this server.');
                   }
                 }
-                else{
+                if(args[1] != 'true' && args[1] != 'false'){
                   msg.channel.send('Please only include either true or false or neither to switch the current setting.');
                 }
               }
