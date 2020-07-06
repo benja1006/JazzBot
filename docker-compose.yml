@@ -1,0 +1,25 @@
+version: "3.8"
+services:
+  jazzbot:
+    container_name: jazz_bot_app
+    image: jazz_bot:latest
+    command: "node index.js"
+    working_dir: /app
+    volumes:
+      - ./:/app
+    depends_on:
+      - "mysql"
+  mysql:
+    container_name: jazz_bot_db
+    image: mysql:latest
+    volumes:
+      - ./mysql:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=null
+      - MYSQL_DATABASE=jazzbot
+    ports:
+      - "3306:3306"
+    cap_add:
+      - SYS_NICE  # CAP_SYS_NICE
+volumes:
+  jazzbot-mysql-data:

@@ -14,7 +14,7 @@ const SQLUSERNAME = process.env.SQLUSERNAME;
 const SQLPASSWORD = process.env.SQLPASSWORD;
 const Model = Sequelize.Model;
 const sequelize = new Sequelize('jazzbot', SQLUSERNAME, SQLPASSWORD, {
-  host: 'localhost',
+  host: 'mysql',
   dialect: 'mysql'
 });
 sequelize

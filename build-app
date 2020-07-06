@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+docker build -t jazz_bot .
+npm install

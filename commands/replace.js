@@ -22,7 +22,7 @@ module.exports = {
     const prefix = process.env.PREFIX + ' ';
     const Sequelize = require('sequelize');
     const sequelize = new Sequelize('jazzbot', SQLUSERNAME, SQLPASSWORD, {
-      host: 'localhost',
+      host: 'mysql',
       dialect: 'mysql'
     });
     const Model = Sequelize.Model;
