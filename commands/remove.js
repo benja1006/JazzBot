@@ -7,11 +7,11 @@ module.exports = {
   execute(msg, args, isMod) {
     var tokenArr = msg.client.tokenArr;
     const serverQueue = msg.client.queue.get(msg.guild.id);
-    if(!message.member.voice.channel){
+    if(!msg.member.voice.channel){
       return msg.channel.send("You have to be in a voice channel to remove the song!");
     }
     if(!serverQueue){
-      return message.channel.send("There is no song playing to remove");
+      return msg.channel.send("There is no song playing to remove");
     }
     //connect to database to get song url's
     const SQLUSERNAME = process.env.SQLUSERNAME;

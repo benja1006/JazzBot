@@ -7,11 +7,11 @@ module.exports = {
   execute(msg, args, isMod) {
     var tokenArr = msg.client.tokenArr;
     const serverQueue = msg.client.queue.get(msg.guild.id);
-    if(!message.member.voice.channel){
+    if(!msg.member.voice.channel){
       return msg.channel.send("You have to be in a voice channel to replace the song!");
     }
     if(!serverQueue){
-      return message.channel.send("There is no song playing to replace");
+      return msg.channel.send("There is no song playing to replace");
     }
     if(args.length != 1){
       return msg.channel.send("Please include one youtube link to replace the song with.");

@@ -27,6 +27,7 @@ module.exports = {
       }
     }
     let data = env.SpotifyID + ':' + env.SpotifySecret;
+    console.log(data);
     let buff = new Buffer.from(data);
     let base64data = buff.toString('base64');
     config.headers['Authorization'] = 'Basic ' + base64data;

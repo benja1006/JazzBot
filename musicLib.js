@@ -1,4 +1,4 @@
-const ytdl = require('ytdl-core-discord');
+const ytdl = require('ytdl-core');
 module.exports = {
   play: function(guild, song) {
     const queue = guild.client.queue;
@@ -13,7 +13,7 @@ module.exports = {
       .play(ytdl(song.url))
       .on("finish", () => {
         serverQueue.songs.shift();
-        play(guild,serverQueue.songs[0]);
+        module.exports.play(guild,serverQueue.songs[0]);
       })
       .on("error", error => console.error(error));
     dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);

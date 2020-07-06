@@ -146,7 +146,8 @@ BotEnv.sync().then(() => {
       if(msg.author.id == '134454672378298370' && msg.channel.type == 'dm' && !authCode && !bot.authToken){
         authCode = msg.content;
         msg.channel.send('Spotify Auth code added');
-        bot.authToken = Spotify.getAccessToken(authCode, env).then(() => {
+        Spotify.getAccessToken(authCode, env).then(tokenArr => {
+          bot.tokenArr = tokenArr;
           console.log('Logged into Spotify');
         }).catch(err => console.error(err));
       }
@@ -185,7 +186,7 @@ BotEnv.sync().then(() => {
          if(command.reqMusic && !Server[0].Music){
            return msg.channel.send('Music is not enabled on this server.');
          }
-         if(command.reqMusic && !bot.authToken){
+         if(command.reqMusic && !bot.tokenArr){
            return msg.channel.send('Spotify has not yet been signed in to.');
          }
          //Cooldowns

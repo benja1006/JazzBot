@@ -7,11 +7,11 @@ module.exports = {
   execute(msg, args, isMod) {
     var tokenArr = msg.client.tokenArr;
     const serverQueue = msg.client.queue.get(msg.guild.id);
-    if(!message.member.voice.channel){
+    if(!msg.member.voice.channel){
       return msg.channel.send("You have to be in a voice channel to skip the song!");
     }
     if(!serverQueue){
-      return message.channel.send("There is no song playing to skip");
+      return msg.channel.send("There is no song playing to skip");
     }
     serverQueue.connection.dispatcher.end();
   },
