@@ -93,18 +93,21 @@ module.exports = {
 
           let items = returnArr[1];
           items = shuffle(items);
-          for(let i = 0; i < items.length; i++){
+          let i = 0;
+          async function songLoop(){
             /* for each item if the database has a link, procede with normal playback
             if the database has no link, look up the song with youtube
             */
+            let didYTLookup = false;
             await Songs.findOne({
               where: {
                 SpotID: items[i].track.id
               }
             }).then(async function(songObj) {
               if(!songObj){
+                didYTLookup = true;
                 //lookup song on youtube
-                let songResource = await Youtube.lookup(items[i].track.name, items[i].track.artists[0].name);//name, artist
+                let songResource = await Youtube.lookup(items[i].track.name, items[i].track.artists[0].name, msg);//name, artist
                 songObj = await Songs.create({
                   SpotID: items[i].track.id,
                   YTID: songResource.id.videoId
@@ -140,8 +143,19 @@ module.exports = {
                   //console.log(msg.client.queue.get(msg.guild.id).songs);
                 }
               }
+
             });
+            i++;
+            if(i<items.length){
+              if(didYTLookup){
+                setTimeout(songLoop, 30000);
+              }
+              else{
+                songLoop();
+              }
+            }
           }
+          songLoop();
         });
       });
     }
