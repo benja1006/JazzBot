@@ -46,7 +46,7 @@ sequelize
     sequelize,
     modelName: 'BotEnv'
   });
-  BotEnv.sync().then(() => {
+  BotEnv.sync({force: true}).then(() => {
     BotEnv.create({
       ID: 1,
       DisToken: DisToken,

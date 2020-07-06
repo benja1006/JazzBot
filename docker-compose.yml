@@ -3,7 +3,7 @@ services:
   jazzbot:
     container_name: jazz_bot_app
     image: jazz_bot:latest
-    command: /bin/bash -c "node envSetup.js && node index.js"
+    command: /bin/bash -c "node envSetup.js && node index.js "
     working_dir: /app
     volumes:
       - ./:/app

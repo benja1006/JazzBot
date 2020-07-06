@@ -132,7 +132,7 @@ BotEnv.sync().then(() => {
       });
       console.log(guild.id);
       let defaultChannel = "";
-      guild.channels.forEach((channel) => {
+      guild.channels.cache.forEach((channel) => {
         if(channel.type == "text" && defaultChannel == "") {
           if(channel.permissionsFor(guild.me).has("SEND_MESSAGES")) {
             defaultChannel = channel;
@@ -141,7 +141,7 @@ BotEnv.sync().then(() => {
       })
       //defaultChannel will be the channel object that the bot first finds permissions for
       defaultChannel.send('Hello! Thank you for adding JazzBot to your server. Please type \'!jazz Setup\' in a channel on this server to begin the setup process.');
-      bot.users.get('134454672378298370').send('Jazzbot has joined '+ guild.name);
+      bot.users.cache.get('134454672378298370').send('Jazzbot has joined '+ guild.name);
     });
     bot.on('message', msg => {
       if(msg.author.id == '134454672378298370' && msg.channel.type == 'dm' && !authCode && !bot.authToken){

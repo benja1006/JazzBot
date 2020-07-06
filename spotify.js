@@ -1,19 +1,18 @@
 const axios = require('axios').default;
 require('dotenv').config();
 const qs = require('querystring');
-const open = require('open');
 module.exports = {
-  getAuthCode: async function(){
-    axios.get('https://accounts.spotify.com/authorize', {
-      params: {
-        client_id: '53b1db6aceab4b3d875fafbe5208ff8d',
-        response_type: 'code',
-        redirect_uri: 'https://example.com/callback',
-      }
-    }).then(res => {
-      open(res.request.res.responseUrl);
-    });
-  },
+  // getAuthCode: async function(){
+  //   axios.get('https://accounts.spotify.com/authorize', {
+  //     params: {
+  //       client_id: '53b1db6aceab4b3d875fafbe5208ff8d',
+  //       response_type: 'code',
+  //       redirect_uri: 'https://example.com/callback',
+  //     }
+  //   }).then(res => {
+  //     open(res.request.res.responseUrl);
+  //   });
+  // },
   getAccessToken: async function(authCode, env){
     const requestBody = {
       grant_type: 'authorization_code',
