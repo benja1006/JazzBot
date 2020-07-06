@@ -108,6 +108,7 @@ module.exports = {
                 didYTLookup = true;
                 //lookup song on youtube
                 let songResource = await Youtube.lookup(items[i].track.name, items[i].track.artists[0].name, msg);//name, artist
+                if(!songResource) return msg.channel.send('The youtube data cap has been hit. More songs can be added tomorrow.');
                 songObj = await Songs.create({
                   SpotID: items[i].track.id,
                   YTID: songResource.id.videoId
