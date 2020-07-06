@@ -5,10 +5,11 @@ module.exports = {
   description: 'Suggest something to the Moderators',
   aliases: ['suggestion'],
   usage: ['suggest suggestion'],
-  cooldown: 300,
+  cooldown: 0,
   guildOnly: true,
   modOnly: false,
-  execute(msg, args) {
+  reqMusic: false,
+  execute(msg, args, isMod) {
     if(args.length == 0){
       return msg.author.send("Please include a message in your suggestion");
     }
@@ -44,6 +45,9 @@ module.exports = {
       ManagerRole: {
         type: Sequelize.BIGINT(18),
         autoIncrement: false
+      },
+      Music: {
+        type: Sequelize.BOOLEAN,
       }
     }, {
       sequelize,
@@ -79,6 +83,9 @@ module.exports = {
             },
           ],
         };
+        if(isMod){
+          suggestionEmbed.color = 0xde2121;
+        }
         msg.guild.channels.cache.get(suggestID).send({ embed: suggestionEmbed});
       });
     });

@@ -5,23 +5,18 @@ module.exports = {
   aliases: ['commands'],
   usage: ['command name'],
   cooldown: 5,
-  execute(msg, args, isMod) {
+  reqMusic: false,
+  execute(msg, args, isMod, allowMusic) {
     const data = [];
     const { commands } = msg.client;
     if (!args.length){
       data.push('Here\'s a list of all my commands:');
-      // let modCommands = [];
-      // for(let i=0; i < commands.length; i++){
-      //   if(commands[i].modOnly == true){
-      //     modCommands.push(commands[i]);
-      //   }
-      // }
-      //console.log(modCommands);
-      if(!isMod){
-        data.push(commands.filter(command => !command.modOnly).map(command => command.name).join(', '));
+      data.push(commands.filter(command => !command.modOnly && !command.reqMusic).map(command => command.name).join(', '));
+      if(isMod){
+        data.push(commands.filter(command => command.modOnly).map(command => command.name).join(', '));
       }
-      else{
-        data.push(commands.map(command => command.name).join(', '));
+      if(allowMusic){
+        data.push(commands.filter(command => command.reqMusic).map(command => command.name).join(', '));
       }
       data.push(`\nYou can send \`${prefix}help [command name]\` to get info on a specific command!`);
       if (msg.channel.type === 'text'){
