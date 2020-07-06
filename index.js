@@ -23,7 +23,8 @@ sequelize
     console.log('Connection has been established successfully.');
   })
   .catch(err => {
-    console.error('Unable to connect to the database:', err);
+    console.error('Unable to connect to the database, retrying');
+    setTimeout(sequelize.authenticate(), 5000);
   });
 class Servers extends Model {}
 Servers.init({

@@ -54,7 +54,7 @@ module.exports = {
           Server: msg.guild.id
         }
       }).then(Server => {
-        console.log(Server[0].ID);
+        //console.log(Server[0].ID);
         if(args.length == 0){
 
             msg.channel.send("First, I need to know who should have mod priveleges on this bot.");
@@ -71,7 +71,7 @@ module.exports = {
                   if(modRole == null){
                     return msg.channel.send("This is not a valid role id");
                   }
-                  msg.channel.send("The "+ modRole.name +" role has been given moderator priveledges");
+                  msg.channel.send("The "+ modRole.name +" role has been given moderator priveleges");
                   Servers.update({
                     ManagerRole: args[1]
                   },

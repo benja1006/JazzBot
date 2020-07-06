@@ -52,7 +52,7 @@ module.exports = {
     data.push(`Cooldown: ${command.cooldown || 3} second(s)`);
 
    if (msg.channel.type === 'text'){
-     msg.delete(5000);
+     msg.delete();
    }
    return msg.channel.send(data, { split: true });
  },
