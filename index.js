@@ -113,7 +113,7 @@ BotEnv.sync().then(() => {
       console.log(err);
     });
     bot.on('ready', () => {
-    	bot.user.setPresence({game: {name: '!jazz'}});
+    	bot.user.setPresence({activity: {name: '!jazz'}});
     		console.info(`Logged into discord as ${bot.user.tag}!`);
         //const defaultChannel = bot.channels.get(process.env.DEFAULT);
     });
