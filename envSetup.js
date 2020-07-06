@@ -1,8 +1,9 @@
-const DisToken =
-const YTKey =
-cont SpotifyID =
-const SpotifySecret = 
+const DisToken = 'NzEyMjU0NjYzMDI1NDkxOTk5.XwKm9Q.itJvskaCmdxi8K5UTLYejb-tTiM';
+const YTKey = 'AIzaSyAT6lqWE6_W5Zu25IbwZLPVVsNg1qyQQ7w';
+const SpotifyID = '53b1db6aceab4b3d875fafbe5208ff8d';
+const SpotifySecret = 'd0e0936b369a40ff8fe4fa839abf4291';
 const Sequelize = require('sequelize');
+require('dotenv').config();
 const SQLUSERNAME = process.env.SQLUSERNAME;
 const SQLPASSWORD = process.env.SQLPASSWORD;
 const Model = Sequelize.Model;
@@ -50,7 +51,7 @@ sequelize
       ID: 1,
       DisToken: DisToken,
       YTKey: YTKey,
-      SPotifyID: SpotifyID,
+      SpotifyID: SpotifyID,
       SpotifySecret: SpotifySecret
     });
   });
