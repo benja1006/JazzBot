@@ -33,6 +33,8 @@ module.exports = {
 
     let res = await axios.post('https://accounts.spotify.com/api/token', qs.stringify(requestBody), config).catch(function(error) {
       return console.log(error);
+    }).catch(err => {
+      return false
     });
     const now = Date.now();
     let tokencd = now + res.data.expires_in;

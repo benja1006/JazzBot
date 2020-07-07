@@ -4,7 +4,6 @@ const path = require('path');
 require('dotenv').config();
 //check spotify authentication before anything else
 var tokenArr = [];
-var authCode = null;
 const Youtube = require('./youtube');
 const Spotify = require('./spotify');
 
@@ -22,9 +21,9 @@ sequelize
   .then(() => {
     console.log('Connection has been established successfully.');
   })
-  .catch(err => {
+  .catch(async function(err) {
     console.error('Unable to connect to the database, retrying');
-    setTimeout(sequelize.authenticate(), 5000);
+    setTimeout(await sequelize.authenticate(), 5000);
   });
 class Servers extends Model {}
 Servers.init({
@@ -154,10 +153,12 @@ BotEnv.sync().then(() => {
       bot.users.cache.get('134454672378298370').send('Jazzbot has joined '+ guild.name);
     });
     bot.on('message', msg => {
-      if(msg.author.id == '134454672378298370' && msg.channel.type == 'dm' && !authCode && !bot.authToken){
-        authCode = msg.content;
+      if(msg.author.id == '134454672378298370' && msg.channel.type == 'dm' && !bot.authToken){
         msg.channel.send('Spotify Auth code added');
-        Spotify.getAccessToken(authCode, env).then(tokenArr => {
+        Spotify.getAccessToken(msg.content, env).then(tokenArr => {
+          if(!tokenArr){
+            return msg.channel.send('Something went wrong with the spotify Authentication. Please try again.');
+          }
           bot.tokenArr = tokenArr;
           console.log('Logged into Spotify');
         }).catch(err => console.error(err));
