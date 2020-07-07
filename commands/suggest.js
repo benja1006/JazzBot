@@ -5,7 +5,7 @@ module.exports = {
   description: 'Suggest something to the Moderators',
   aliases: ['suggestion'],
   usage: ['suggest suggestion'],
-  cooldown: 0,
+  cooldown: 300,
   guildOnly: true,
   modOnly: false,
   reqMusic: false,
@@ -59,9 +59,15 @@ module.exports = {
           Server: msg.guild.id
         }
       }).then(Server => {
+        if(!Server[0]){
+          return msg.reply("This server hasn't been setup properly. Please kick the bot and re add it.");
+        }
         suggestID = Server[0].Suggest;
         if(suggestID == null){
           return msg.reply("Suggestions are not yet enabled on this server.");
+        }
+        if(msg.guild.channels.cache.get(!suggestID)){
+          return msg.reply("The suggest channel has been incorrectly setup on this server. Please contact a mod for help.");
         }
         var suggestion = args[0];
         for(i = 1; i<args.length; i++){

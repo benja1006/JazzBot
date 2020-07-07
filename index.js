@@ -120,7 +120,17 @@ BotEnv.sync().then(() => {
     bot.on('error', err => {
       console.log(err);
     });
-
+    bot.on('guildMemberUpdate', (oldMember, newMember) => {
+      let channel = oldMember.voice.channel;
+      if(channel.members.array.length == 1 && channel.members.has(msg.client.id)){
+        //the bot is the only one in the voice channel
+        let serverQueue = oldMember.client.queue.get(oldMember.guild.it)
+        if(serverQueue){
+          serverQueue.songs = [];
+          serverQueue.connection.dispatcher.end();
+        }
+      }
+    });
     //When added to a new server
     bot.on('guildCreate', guild => {
       //Start mysql connection
@@ -175,6 +185,9 @@ BotEnv.sync().then(() => {
            Server: msg.guild.id
          }
        }).then(Server => {
+         if(!Server[0]){
+           return msg.reply("This server hasn't been setup properly. Please kick the bot and re add it.");
+         }
          let modRole = Server[0].ManagerRole;
          let authorID = msg.author.id;
          let guildAuthor = msg.member;
