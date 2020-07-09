@@ -10,7 +10,7 @@ module.exports = {
     }
 
     const dispatcher = serverQueue.connection
-      .play(ytdl(song.url))
+      .play(ytdl(song.url, {quality: 140}))
       .on("finish", () => {
         serverQueue.songs.shift();
         module.exports.play(guild,serverQueue.songs[0]);
