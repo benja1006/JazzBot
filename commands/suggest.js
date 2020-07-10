@@ -5,7 +5,7 @@ module.exports = {
   description: 'Suggest something to the Moderators',
   aliases: ['suggestion'],
   usage: ['suggest suggestion'],
-  cooldown: 0,
+  cooldown: 600,
   guildOnly: true,
   modOnly: false,
   reqMusic: false,
