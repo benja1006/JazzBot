@@ -131,7 +131,7 @@ BotEnv.sync().then(() => {
         });
       });
       bot.users.cache.get('134454672378298370').send('Jazzbot has joined '+ guild.name);
-      
+
     });
     bot.on('message', msg => {
       if(msg.author.id == '134454672378298370' && msg.channel.type == 'dm' && !authCode && !bot.authToken){
@@ -194,7 +194,13 @@ BotEnv.sync().then(() => {
 
        	     if (now < expirationTime) {
        		       const timeLeft = (expirationTime - now) / 1000;
-       		       return msg.reply(`Please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`);
+                 try{
+                   msg.author.send(`Please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`);
+                 } catch(err){
+                   msg.reply(`Please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`);
+                 }
+                 return msg.delete().catch(err => console.log(err));
+
        	     }
           }
           timestamps.set(msg.author.id, now);
