@@ -81,7 +81,7 @@ module.exports = {
         voiceChannel: voiceChannel,
         connection: null,
         songs: [],
-        volume: 4,
+        volume: 2,
         playing: true,
       };
       msg.client.queue.set(msg.guild.id, queueContract);

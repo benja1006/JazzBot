@@ -98,12 +98,18 @@ BotEnv.sync().then(() => {
     const cooldowns = new Discord.Collection();
     const prefix = process.env.PREFIX + ' ';
     bot.commands = new Discord.Collection();
+    bot.adminCommands = new Discord.Collection();
     bot.env = env;
     bot.queue = new Map();
     const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
     for (const file of commandFiles) {
     	const command = require(`./commands/${file}`);
     	bot.commands.set(command.name, command);
+    }
+    const adminCmdFiles = fs.reddirSync('./commands/admin').filter(file => file.endsWith('.js'));
+    for(const file of commandFiles) {
+      let command = require(`./commands/admin/${file}`);
+      bot.adminCommands.set(command.name, command);
     }
 
 
@@ -229,7 +235,11 @@ BotEnv.sync().then(() => {
             isMod = true;
           }
           let allowMusic = Server[0].Music;
-
+          //if command is admin, make sure the user is a bot admin (aka me)
+          if(command.name == 'admin' && msg.author.id != '134454672378298370'){
+            msg.author.send('You have found the secret admin command. Unfortunately it is not available to you.').catch(err => console.log(err));
+            msg.delete();
+          }
           //excecute command
           try{
             command.execute(msg, args, isMod, allowMusic);
