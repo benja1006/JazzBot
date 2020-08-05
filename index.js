@@ -171,8 +171,18 @@ BotEnv.sync().then(() => {
           Server: guild.id
         });
       });
+      console.log(guild.id);
+      let defaultChannel = "";
+      guild.channels.cache.forEach((channel) => {
+        if(channel.type == "text" && defaultChannel == "") {
+          if(channel.permissionsFor(guild.me).has("SEND_MESSAGES")) {
+            defaultChannel = channel;
+          }
+        }
+      })
+      //defaultChannel will be the channel object that the bot first finds permissions for
+      defaultChannel.send('Hello! Thank you for adding JazzBot to your server. Please type \'!jazz Setup\' in a channel on this server to begin the setup process.');
       bot.users.cache.get('134454672378298370').send('Jazzbot has joined '+ guild.name);
-
     });
     bot.on('message', msg => {
       if(msg.author.id == '134454672378298370' && msg.channel.type == 'dm' && !bot.authToken){
@@ -240,13 +250,7 @@ BotEnv.sync().then(() => {
 
        	     if (now < expirationTime) {
        		       const timeLeft = (expirationTime - now) / 1000;
-                 try{
-                   msg.author.send(`Please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`);
-                 } catch(err){
-                   msg.reply(`Please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`);
-                 }
-                 return msg.delete().catch(err => console.log(err));
-
+       		       return msg.reply(`Please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`);
        	     }
           }
           timestamps.set(msg.author.id, now);
