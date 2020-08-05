@@ -54,6 +54,9 @@ module.exports = {
           Server: msg.guild.id
         }
       }).then(Server => {
+        if(!Server[0]){
+          return msg.reply("This server hasn't been setup properly. Please kick the bot and re add it.");
+        }
         //console.log(Server[0].ID);
         if(args.length == 0){
 

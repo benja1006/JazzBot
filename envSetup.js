@@ -42,6 +42,9 @@ sequelize
       type: Sequelize.STRING(59),
       autoIncrement: false
     },
+    SpotifyToken: {
+      type: Sequelize.STRING(59),
+    },
   }, {
     sequelize,
     modelName: 'BotEnv'

@@ -4,7 +4,6 @@ const path = require('path');
 require('dotenv').config();
 //check spotify authentication before anything else
 var tokenArr = [];
-var authCode = null;
 const Youtube = require('./youtube');
 const Spotify = require('./spotify');
 
@@ -22,9 +21,9 @@ sequelize
   .then(() => {
     console.log('Connection has been established successfully.');
   })
-  .catch(err => {
+  .catch(async function(err) {
     console.error('Unable to connect to the database, retrying');
-    setTimeout(sequelize.authenticate, 5000);
+    setTimeout(await sequelize.authenticate(), 5000);
   });
 class Servers extends Model {}
 Servers.init({
@@ -79,6 +78,9 @@ BotEnv.init({
     type: Sequelize.STRING(59),
     autoIncrement: false
   },
+  SpotifyToken: {
+    type: Sequelize.STRING(59),
+  },
 }, {
   sequelize,
   modelName: 'BotEnv'
@@ -99,12 +101,18 @@ BotEnv.sync().then(() => {
     const cooldowns = new Discord.Collection();
     const prefix = process.env.PREFIX + ' ';
     bot.commands = new Discord.Collection();
+    bot.adminCommands = new Discord.Collection();
     bot.env = env;
     bot.queue = new Map();
     const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
     for (const file of commandFiles) {
     	const command = require(`./commands/${file}`);
     	bot.commands.set(command.name, command);
+    }
+    const adminCmdFiles = fs.readdirSync('./commands/admin').filter(file => file.endsWith('.js'));
+    for(const file of adminCmdFiles) {
+      let command = require(`./commands/admin/${file}`);
+      bot.adminCommands.set(command.name, command);
     }
 
 
@@ -116,11 +124,44 @@ BotEnv.sync().then(() => {
     	bot.user.setPresence({activity: {name: '!jazz'}});
     		console.info(`Logged into discord as ${bot.user.tag}!`);
         //const defaultChannel = bot.channels.get(process.env.DEFAULT);
+
+        //Try to login to spotify using stored token
+        console.log('SPOTIFY TOKEN');
+        console.log(bot.env.SpotifyToken);
+        if(bot.env.SpotifyToken != 'null'){
+          Spotify.getAccessToken(env.SpotifyToken, env).then(tokenArr => {
+            bot.tokenArr = tokenArr;
+            BotEnv.update({
+              SpotifyToken: tokenArr[2]
+            },
+            { where: {
+              ID: 1,
+            }}).then(() => bot.users.cache.get('134454672378298370').send('A new spotify login is needed.'));
+          }).catch(err => {
+            bot.users.cache.get('134454672378298370').send('A new spotify login is needed.').catch(() => console.log('Login to spotify'));
+          });
+        }
+        else {
+          bot.users.cache.get('134454672378298370').send('A new spotify login is needed.').catch(() => console.log('Login to spotify'));
+        }
     });
     bot.on('error', err => {
       console.log(err);
     });
-
+    bot.on('voiceStateUpdate', (oldState, newState) => {
+      if(oldState.channel == null){
+        return;
+      }
+      let channel = oldState.channel;
+      if(channel.members.array.length == 1 && channel.members.has(msg.client.id)){
+        //the bot is the only one in the voice channel
+        let serverQueue = oldMember.client.queue.get(oldMember.guild.it)
+        if(serverQueue){
+          serverQueue.songs = [];
+          serverQueue.connection.dispatcher.end();
+        }
+      }
+    });
     //When added to a new server
     bot.on('guildCreate', guild => {
       //Start mysql connection
@@ -130,14 +171,26 @@ BotEnv.sync().then(() => {
           Server: guild.id
         });
       });
+      console.log(guild.id);
+      let defaultChannel = "";
+      guild.channels.cache.forEach((channel) => {
+        if(channel.type == "text" && defaultChannel == "") {
+          if(channel.permissionsFor(guild.me).has("SEND_MESSAGES")) {
+            defaultChannel = channel;
+          }
+        }
+      })
+      //defaultChannel will be the channel object that the bot first finds permissions for
+      defaultChannel.send('Hello! Thank you for adding JazzBot to your server. Please type \'!jazz Setup\' in a channel on this server to begin the setup process.');
       bot.users.cache.get('134454672378298370').send('Jazzbot has joined '+ guild.name);
-
     });
     bot.on('message', msg => {
-      if(msg.author.id == '134454672378298370' && msg.channel.type == 'dm' && !authCode && !bot.authToken){
-        authCode = msg.content;
+      if(msg.author.id == '134454672378298370' && msg.channel.type == 'dm' && !bot.authToken){
         msg.channel.send('Spotify Auth code added');
-        Spotify.getAccessToken(authCode, env).then(tokenArr => {
+        Spotify.getAccessToken(msg.content, env).then(tokenArr => {
+          if(!tokenArr){
+            return msg.channel.send('Something went wrong with the spotify Authentication. Please try again.');
+          }
           bot.tokenArr = tokenArr;
           console.log('Logged into Spotify');
         }).catch(err => console.error(err));
@@ -165,6 +218,9 @@ BotEnv.sync().then(() => {
            Server: msg.guild.id
          }
        }).then(Server => {
+         if(!Server[0]){
+           return msg.reply("This server hasn't been setup properly. Please kick the bot and re add it.");
+         }
          let modRole = Server[0].ManagerRole;
          let authorID = msg.author.id;
          let guildAuthor = msg.member;
@@ -194,13 +250,7 @@ BotEnv.sync().then(() => {
 
        	     if (now < expirationTime) {
        		       const timeLeft = (expirationTime - now) / 1000;
-                 try{
-                   msg.author.send(`Please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`);
-                 } catch(err){
-                   msg.reply(`Please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`);
-                 }
-                 return msg.delete().catch(err => console.log(err));
-
+       		       return msg.reply(`Please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`);
        	     }
           }
           timestamps.set(msg.author.id, now);
@@ -211,7 +261,11 @@ BotEnv.sync().then(() => {
             isMod = true;
           }
           let allowMusic = Server[0].Music;
-
+          //if command is admin, make sure the user is a bot admin (aka me)
+          if(command.name == 'admin' && msg.author.id != '134454672378298370'){
+            msg.author.send('You have found the secret admin command. Unfortunately it is not available to you.').catch(err => console.log(err));
+            msg.delete();
+          }
           //excecute command
           try{
             command.execute(msg, args, isMod, allowMusic);

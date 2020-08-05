@@ -1,24 +1,18 @@
 const prefix = process.env.PREFIX + ' ';
 module.exports = {
   name: 'help',
-  description: 'List all of my commands or info about a specific command',
+  description: 'List all of my admin commands or info about a specific command',
   aliases: ['commands'],
   usage: ['command name'],
   cooldown: 5,
   reqMusic: false,
-  execute(msg, args, isMod, allowMusic) {
+  execute(msg, args) {
     const data = [];
-    const { commands } = msg.client;
+    const commands = msg.client.adminCommands;
     if (!args.length){
-      data.push('Here\'s a list of all my commands:');
-      data.push(commands.filter(command => !command.modOnly && !command.reqMusic).map(command => command.name).join(', '));
-      if(isMod){
-        data.push(commands.filter(command => command.modOnly && command.name != 'admin').map(command => command.name).join(', '));
-      }
-      if(allowMusic){
-        data.push(commands.filter(command => command.reqMusic).map(command => command.name).join(', '));
-      }
-      data.push(`\nYou can send \`${prefix}help [command name]\` to get info on a specific command!`);
+      data.push('Here\'s a list of all my admin commands:');
+      data.push(commands.map(command => command.name).join(', '));
+      data.push(`\nYou can send \`${prefix}admin help [command name]\` to get info on a specific command!`);
       if (msg.channel.type === 'text'){
         msg.delete();
       }
