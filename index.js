@@ -109,25 +109,12 @@ BotEnv.sync().then(() => {
     	const command = require(`./commands/${file}`);
     	bot.commands.set(command.name, command);
     }
-    const adminCmdFiles = fs.reddirSync('./commands/admin').filter(file => file.endsWith('.js'));
-    for(const file of commandFiles) {
+    const adminCmdFiles = fs.readdirSync('./commands/admin').filter(file => file.endsWith('.js'));
+    for(const file of adminCmdFiles) {
       let command = require(`./commands/admin/${file}`);
       bot.adminCommands.set(command.name, command);
     }
-    //Try to login to spotify using stored token
-    if(env.SpotifyToken){
-      Spotify.getAccessToken(env.SpotifyToken, env).then(tokenArr => {
-        bot.tokenArr = tokenArr;
-        BotEnv.update({
-          SpotifyToken: tokenArr[2]
-        },
-        { where: {
-          ID: 1,
-        }}).then(() => bot.users.cache.get('134454672378298370').send('A new spotify login is needed.'));
-      }).catch(err => {
-        bot.users.cache.get('134454672378298370').send('A new spotify login is needed.');
-      });
-    };
+
 
     //discord login
     bot.login(bot.env.DisToken).catch(err => {
@@ -137,12 +124,35 @@ BotEnv.sync().then(() => {
     	bot.user.setPresence({activity: {name: '!jazz'}});
     		console.info(`Logged into discord as ${bot.user.tag}!`);
         //const defaultChannel = bot.channels.get(process.env.DEFAULT);
+
+        //Try to login to spotify using stored token
+        console.log('SPOTIFY TOKEN');
+        console.log(bot.env.SpotifyToken);
+        if(bot.env.SpotifyToken != 'null'){
+          Spotify.getAccessToken(env.SpotifyToken, env).then(tokenArr => {
+            bot.tokenArr = tokenArr;
+            BotEnv.update({
+              SpotifyToken: tokenArr[2]
+            },
+            { where: {
+              ID: 1,
+            }}).then(() => bot.users.cache.get('134454672378298370').send('A new spotify login is needed.'));
+          }).catch(err => {
+            bot.users.cache.get('134454672378298370').send('A new spotify login is needed.').catch(() => console.log('Login to spotify'));
+          });
+        }
+        else {
+          bot.users.cache.get('134454672378298370').send('A new spotify login is needed.').catch(() => console.log('Login to spotify'));
+        }
     });
     bot.on('error', err => {
       console.log(err);
     });
-    bot.on('guildMemberUpdate', (oldMember, newMember) => {
-      let channel = oldMember.voice.channel;
+    bot.on('voiceStateUpdate', (oldState, newState) => {
+      if(oldState.channel == null){
+        return;
+      }
+      let channel = oldState.channel;
       if(channel.members.array.length == 1 && channel.members.has(msg.client.id)){
         //the bot is the only one in the voice channel
         let serverQueue = oldMember.client.queue.get(oldMember.guild.it)

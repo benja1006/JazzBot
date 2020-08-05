@@ -32,7 +32,7 @@ module.exports = {
     config.headers['Authorization'] = 'Basic ' + base64data;
 
     let res = await axios.post('https://accounts.spotify.com/api/token', qs.stringify(requestBody), config).catch(function(error) {
-      return console.log(error);
+      return console.log('An Error has occured in getting a spotify token');
     }).catch(err => {
       return false
     });

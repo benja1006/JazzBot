@@ -13,7 +13,7 @@ module.exports = {
     if (!command) return msg.channel.send(`There is no command with name or alias \`${commandName}\`, ${msg.author}!`);
 
 
-    delete require.cache[require.resolve(`./admin/${commandName}.js`)];
+    delete require.cache[require.resolve(`./${commandName}.js`)];
     try {
 	     const newCommand = require(`./${commandName}.js`);
 	     msg.client.adminCommands.set(newCommand.name, newCommand);

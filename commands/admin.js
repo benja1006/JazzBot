@@ -14,7 +14,7 @@ module.exports = {
     }
     let commandName = args.shift().toLowerCase();
     if(!bot.adminCommands.has(commandName)){
-      return msg.author.reply(`That command does not exist. Try ${prefix}admin help for help`);
+      return msg.reply(`That command does not exist. Try ${prefix}admin help for help`);
     }
     const command = bot.adminCommands.get(commandName);
     try{
