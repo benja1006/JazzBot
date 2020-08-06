@@ -125,7 +125,16 @@ module.exports = {
                     }
                   });
                 });//name, artist
-                if(!songResource) return msg.channel.send('The youtube data cap has been hit. More songs can be added tomorrow.');
+                if(!songResource){
+                  msg.channel.send('The youtube data cap has been hit. More songs can be added tomorrow.');
+                  i++
+                  if(i<items.length){
+                    return songLoop();
+                  }
+                  else{
+                    return
+                  }
+                }
                 songObj = await Songs.create({
                   SpotID: items[i].track.id,
                   YTID: songResource.id.videoId
@@ -193,7 +202,7 @@ module.exports = {
 
             if(i<items.length && msg.client.queue.get(msg.guild.id)){
               if(didYTLookup){
-                setTimeout(songLoop, 100);
+                setTimeout(songLoop, 1000);
               }
               else{
                 songLoop();
