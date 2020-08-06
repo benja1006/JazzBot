@@ -90,6 +90,10 @@ module.exports = {
       //get songs from database
       console.log('about to get songs.');
       Songs.sync().then(() => {
+        if(tokenArr[0] >= Date.now()){
+          tokenArr = await Spotify.getAccessToken(tokenArr[1], msg.client.env);
+          msg.client.tokenArr = tokenArr;
+        }
         Spotify.getSongs(tokenArr, playlistId).then(async function(returnArr){
           console.log('getSongs has ran');
 
