@@ -129,14 +129,14 @@ BotEnv.sync().then(() => {
         console.log('SPOTIFY TOKEN');
         console.log(bot.env.SpotifyToken);
         if(bot.env.SpotifyToken != 'null'){
-          Spotify.getAccessToken(env.SpotifyToken, env).then(tokenArr => {
+          Spotify.getRefreshToken(env.SpotifyToken, env).then(tokenArr => {
             bot.tokenArr = tokenArr;
             BotEnv.update({
               SpotifyToken: tokenArr[2]
             },
             { where: {
               ID: 1,
-            }}).then(() => bot.users.cache.get('134454672378298370').send('A new spotify login is needed.'));
+            }}).then(() => bot.users.cache.get('134454672378298370').send('Spotify has been logged into'));
           }).catch(err => {
             bot.users.cache.get('134454672378298370').send('A new spotify login is needed.').catch(() => console.log('Login to spotify'));
           });

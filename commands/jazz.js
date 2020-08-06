@@ -89,9 +89,9 @@ module.exports = {
       msg.client.queue.set(msg.guild.id, queueContract);
       //get songs from database
       console.log('about to get songs.');
-      Songs.sync().then(() => {
+      Songs.sync().then(async function() {
         if(tokenArr[0] >= Date.now()){
-          tokenArr = await Spotify.getAccessToken(tokenArr[1], msg.client.env);
+          tokenArr = await Spotify.getRefreshToken(tokenArr[1], msg.client.env);
           msg.client.tokenArr = tokenArr;
         }
         Spotify.getSongs(tokenArr, playlistId).then(async function(returnArr){
