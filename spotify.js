@@ -43,6 +43,34 @@ module.exports = {
     let tokenArr = [tokencd, refreshToken, accessToken];
     return tokenArr;
   },
+  getRefreshToken: async function(refreshToken, env){
+    const requestBody = {
+      grant_type: 'refresh_token',
+      refresh_token: refreshToken
+    }
+    const config = {
+      headers: {
+        'Authorization' : '',
+        'Content-Type': 'application/x-www-form-urlencoded',
+      }
+    }
+    let data = env.SpotifyID + ':' + env.SpotifySecret;
+    //console.log(data);
+    let buff = new Buffer.from(data);
+    let base64data = buff.toString('base64');
+    config.headers['Authorization'] = 'Basic ' + base64data;
+
+    let res = await axios.post('https://accounts.spotify.com/api/token', qs.stringify(requestBody), config).catch(function(error) {
+      console.log(error);
+      return console.log('An Error has occured in getting a refresh token');
+    });
+    const now = Date.now();
+    let tokencd = now + res.data.expires_in;
+    let newRefreshToken = res.data.refresh_token;
+    let accessToken = res.data.access_token;
+    let tokenArr = [tokencd, newRefreshToken, accessToken];
+    return tokenArr;
+  },
   //Returns an array [tokenArr, items]
   getSongs: async function(tokenArr, playlistID){
     var obj = {

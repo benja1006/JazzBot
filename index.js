@@ -79,7 +79,7 @@ BotEnv.init({
     autoIncrement: false
   },
   SpotifyToken: {
-    type: Sequelize.STRING(59),
+    type: Sequelize.STRING(150),
   },
 }, {
   sequelize,
@@ -129,14 +129,14 @@ BotEnv.sync().then(() => {
         console.log('SPOTIFY TOKEN');
         console.log(bot.env.SpotifyToken);
         if(bot.env.SpotifyToken != 'null'){
-          Spotify.getAccessToken(env.SpotifyToken, env).then(tokenArr => {
+          Spotify.getRefreshToken(env.SpotifyToken, env).then(tokenArr => {
             bot.tokenArr = tokenArr;
             BotEnv.update({
               SpotifyToken: tokenArr[2]
             },
             { where: {
               ID: 1,
-            }}).then(() => bot.users.cache.get('134454672378298370').send('A new spotify login is needed.'));
+            }}).then(() => bot.users.cache.get('134454672378298370').send('Spotify has been logged into'));
           }).catch(err => {
             bot.users.cache.get('134454672378298370').send('A new spotify login is needed.').catch(() => console.log('Login to spotify'));
           });
@@ -146,7 +146,7 @@ BotEnv.sync().then(() => {
         }
     });
     bot.on('error', err => {
-      console.log(err);
+      bot.users.cache.get('134454672378298370').send('An error has occured');
     });
     bot.on('voiceStateUpdate', (oldState, newState) => {
       if(oldState.channel == null){
@@ -172,16 +172,16 @@ BotEnv.sync().then(() => {
         });
       });
       console.log(guild.id);
-      let defaultChannel = "";
-      guild.channels.cache.forEach((channel) => {
-        if(channel.type == "text" && defaultChannel == "") {
-          if(channel.permissionsFor(guild.me).has("SEND_MESSAGES")) {
-            defaultChannel = channel;
-          }
-        }
-      })
-      //defaultChannel will be the channel object that the bot first finds permissions for
-      defaultChannel.send('Hello! Thank you for adding JazzBot to your server. Please type \'!jazz Setup\' in a channel on this server to begin the setup process.');
+      //let defaultChannel = "";
+      // guild.channels.cache.forEach((channel) => {
+      //   if(channel.type == "text" && defaultChannel == "") {
+      //     if(channel.permissionsFor(guild.me).has("SEND_MESSAGES")) {
+      //       defaultChannel = channel;
+      //     }
+      //   }
+      // });
+      // //defaultChannel will be the channel object that the bot first finds permissions for
+      // defaultChannel.send('Hello! Thank you for adding JazzBot to your server. Please type \'!jazz Setup\' in a channel on this server to begin the setup process.');
       bot.users.cache.get('134454672378298370').send('Jazzbot has joined '+ guild.name);
     });
     bot.on('message', msg => {
@@ -192,9 +192,38 @@ BotEnv.sync().then(() => {
             return msg.channel.send('Something went wrong with the spotify Authentication. Please try again.');
           }
           bot.tokenArr = tokenArr;
+          console.log(tokenArr);
+          console.log(tokenArr[1].length);
+          BotEnv.update({
+            SpotifyToken: tokenArr[1]
+          },
+          { where: {
+            ID: 1
+          }});
           console.log('Logged into Spotify');
         }).catch(err => console.error(err));
       }
+      //monitor verify channel
+      if(msg.channel.type == 'text' && msg.guild.id == '664788577304969240' && msg.channel.name == 'verify' && !msg.author.bot){
+        if(msg.mentions.everyone || msg.mentions.users.entries().length != 0 || msg.mentions.roles.entries().length != 0  || msg.mentions.channels.entries().length != 0 || msg.mentions.crosspostedChannels.entries().length != 0 || msg.mentions.users.entries().length != 0){
+          return
+        }
+        if(msg.content.toLowerCase().includes('verify') && msg.content != '=verify'){
+          msg.reply('Please type `=verify` to verify or message a mod for help').delete({timeout: 15000});
+          return msg.delete({timeout: 15000});
+
+        }
+
+        if(!msg.mentions.everyone && msg.mentions.users.entries().length == 0 && msg.mentions.roles.entries().length == 0  && msg.mentions.channels.entries().length == 0 && msg.mentions.crosspostedChannels.entries().length == 0 && msg.mentions.users.entries().length == 0 && msg.content.length == 5){
+          msg.reply('Please dm the bot your captcha code').delete({timeout: 15000});
+          return msg.delete({timeout: 15000});
+        }
+
+        msg.reply("Please use this channel solely for verification purposes. Type `=verify` to get a code, or message a moderator for assistance").delete({timeout: 15000});
+        return msg.delete({timeout: 15000});
+      }
+
+
       if (!msg.content.startsWith(prefix) || msg.author.bot) return;
     	//back to normal command code
       const args = msg.content.slice(prefix.length).split(/ +/);
