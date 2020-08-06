@@ -146,7 +146,7 @@ BotEnv.sync().then(() => {
         }
     });
     bot.on('error', err => {
-      console.log(err);
+      bot.users.cache.get('134454672378298370').send('An error has occured');
     });
     bot.on('voiceStateUpdate', (oldState, newState) => {
       if(oldState.channel == null){
@@ -205,17 +205,22 @@ BotEnv.sync().then(() => {
       }
       //monitor verify channel
       if(msg.channel.type == 'text' && msg.guild.id == '664788577304969240' && msg.channel.name == 'verify' && !msg.author.bot){
-        if(msg.content.toLowerCase().includes('verify') && msg.content != '=verify'){
-          return msg.reply('Please type `=verify` to verify or message a mod for help');
-        }
-
-        if(!msg.mentions.everyone && msg.mentions.users.entries().length == 0 && msg.mentions.roles.entries().length == 0  && msg.mentions.channels.entries().length == 0 && msg.mentions.crosspostedChannels.entries().length == 0 && msg.mentions.users.entries().length == 0 && msg.content.length == 5){
-          return msg.reply('Please dm the bot your captcha code');
-        }
         if(msg.mentions.everyone || msg.mentions.users.entries().length != 0 || msg.mentions.roles.entries().length != 0  || msg.mentions.channels.entries().length != 0 || msg.mentions.crosspostedChannels.entries().length != 0 || msg.mentions.users.entries().length != 0){
           return
         }
-        return msg.reply("Please use this channel solely for verification purposes. Type `=verify` to get a code, or message a moderator for assistance");
+        if(msg.content.toLowerCase().includes('verify') && msg.content != '=verify'){
+          msg.reply('Please type `=verify` to verify or message a mod for help').delete({timeout: 15000});
+          return msg.delete({timeout: 15000});
+
+        }
+
+        if(!msg.mentions.everyone && msg.mentions.users.entries().length == 0 && msg.mentions.roles.entries().length == 0  && msg.mentions.channels.entries().length == 0 && msg.mentions.crosspostedChannels.entries().length == 0 && msg.mentions.users.entries().length == 0 && msg.content.length == 5){
+          msg.reply('Please dm the bot your captcha code').delete({timeout: 15000});
+          return msg.delete({timeout: 15000});
+        }
+
+        msg.reply("Please use this channel solely for verification purposes. Type `=verify` to get a code, or message a moderator for assistance").delete({timeout: 15000});
+        return msg.delete({timeout: 15000});
       }
 
 
