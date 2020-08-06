@@ -18,6 +18,7 @@ module.exports = {
   cooldown: 5,
   reqMusic: true,
   execute(msg, args, isMod) {
+
     var tokenArr = msg.client.tokenArr;
     let guildAuthor = msg.member;
     //let guildAuthor = msg.member;
@@ -31,6 +32,7 @@ module.exports = {
     if(!permissions.has("CONNECT") || !permissions.has("SPEAK")) {
       return msg.channel.send("I need permission to join and speak in the voice channel.");
     }
+    msg.channel.send('Starting the Music');
     //connect to database to get song url's
     const SQLUSERNAME = process.env.SQLUSERNAME;
     const SQLPASSWORD = process.env.SQLPASSWORD;
@@ -107,7 +109,18 @@ module.exports = {
               if(!songObj){
                 didYTLookup = true;
                 //lookup song on youtube
-                let songResource = await Youtube.lookup(items[i].track.name, items[i].track.artists[0].name, msg);//name, artist
+                let songResource = await Youtube.lookup(items[i].track.name, items[i].track.artists[0].name, msg).catch(err => {
+                  Songs.destroy({
+                    where: {
+                      SpotID: items[i].track.id
+                    }
+                  }).then(() => {
+                    i++;
+                    if(i<items.length){
+                      return songLoop();
+                    }
+                  });
+                });//name, artist
                 if(!songResource) return msg.channel.send('The youtube data cap has been hit. More songs can be added tomorrow.');
                 songObj = await Songs.create({
                   SpotID: items[i].track.id,
@@ -119,15 +132,36 @@ module.exports = {
               //if the song shouldn't be included. Don't do anything else
               if(songObj.Include){
                 //url of song has been found. It has also been added to database if not already there.
-                const songInfo = await ytdl.getInfo(url);
+                const songInfo = await ytdl.getInfo(url).catch(err => {
+                    i++
+                    if(i<items.length){
+                      return songLoop();
+                    }
+                    else{
+                      return
+                    }
+                });
+                if(!songInfo){
+                  i++
+                  if(i<items.length){
+                    return songLoop();
+                  }
+                  else{
+                    return
+                  }
+                }
                 const song = {
                   title: songInfo.playerResponse.videoDetails.title,
                   url: url
                 };
                 console.log('i is ' + i);
                 if(i == 0){
-                  queueContract.songs.push(song);
-                  console.log(song);
+                  try{
+                    queueContract.songs.push(song);
+                  }
+                  catch (err){
+                    return console.log('Queue was deleted');
+                  }
                   try{
                     console.log('trying');
                     var connection = await voiceChannel.join();
@@ -140,16 +174,22 @@ module.exports = {
                   }
                 }
                 else{
-                  msg.client.queue.get(msg.guild.id).songs.push(song);
+                  try{
+                    msg.client.queue.get(msg.guild.id).songs.push(song);
+                  } catch(err){
+                    return console.log('Queue was deleted');
+                  }
+
                   //console.log(msg.client.queue.get(msg.guild.id).songs);
                 }
               }
 
             });
             i++;
-            if(i<items.length){
+
+            if(i<items.length && msg.client.queue.get(msg.guild.id)){
               if(didYTLookup){
-                setTimeout(songLoop, 30000);
+                setTimeout(songLoop, 100);
               }
               else{
                 songLoop();
