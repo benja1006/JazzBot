@@ -154,10 +154,10 @@ BotEnv.sync().then(() => {
         return;
       }
       let channel = oldState.channel;
-      if(channel.members.array.length == 1 && channel.members.has(msg.client.id)){
+      if(channel.members.array.length == 1 && channel.members.has(channel.guild.members.cache.get())){
         //the bot is the only one in the voice channel
-        let serverQueue = oldMember.client.queue.get(oldMember.guild.it)
-        if(serverQueue){
+        let serverQueue = oldMember.client.queue.get(oldMember.guild.me);
+        if(serverQueue) {
           serverQueue.songs = [];
           serverQueue.connection.dispatcher.end();
         }
