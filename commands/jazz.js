@@ -158,7 +158,7 @@ module.exports = {
                 catch (err) {
                   queueGone = true;
                   console.log('Queue was deleted');
-                  continue;
+                  break;
                 }
                 try{
                   console.log('trying');
