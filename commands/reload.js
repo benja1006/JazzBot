@@ -4,7 +4,7 @@ module.exports = {
   usage: ['command'],
   modOnly: true,
   reqMusic: false,
-  execute(msg, args, isMod) {
+  execute(msg, args) {
     if (!args.length) return msg.channel.send(`You didn't pass any command to reload, ${msg.author}!`);
     const commandName = args[0].toLowerCase();
     if (commandName == 'reload') return msg.channel.send('Cannot reload the \`reload\` command');

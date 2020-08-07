@@ -10,7 +10,7 @@ module.exports = {
     if(!msg.member.voice.channel){
       return msg.channel.send("You have to be in a voice channel to remove the song!");
     }
-    if(!serverQueue){
+    if(!serverQueue || !serverQueue.connection){
       return msg.channel.send("There is no song playing to remove");
     }
     //connect to database to get song url's
