@@ -33,6 +33,7 @@ module.exports = {
 
     let res = await axios.post('https://accounts.spotify.com/api/token', qs.stringify(requestBody), config).catch(function(error) {
       console.log('An Error has occured in getting a spotify token');
+      console.log(error.statusText);
       return false;
     });
     const now = Date.now();
@@ -62,6 +63,7 @@ module.exports = {
     let res = await axios.post('https://accounts.spotify.com/api/token', qs.stringify(requestBody), config).catch(function(error) {
       //console.log(error);
       console.log('An Error has occured in getting a refresh token');
+      console.log(error.statusText);
       return false;
     });
     const now = Date.now();

@@ -9,6 +9,9 @@ function shuffle(array) {
   }
   return array;
 }
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 module.exports = {
   name: 'jazz',
   description: 'Plays Jazz',
@@ -97,120 +100,205 @@ module.exports = {
 
           let items = returnArr[1];
           items = shuffle(items);
+          console.log(items.length);
           let i = 0;
-          async function songLoop() {
-            /* for each item if the database has a link, procede with normal playback
-            if the database has no link, look up the song with youtube
-            */
-            let didYTLookup = false;
-            await Songs.findOne({
+          let queueGone = false;
+          for(i = 0; i<items.length; i++){
+            await sleep(1000*i);
+            let songObj = await Songs.findOne({
               where: {
                 SpotID: items[i].track.id,
               },
-            }).then(async function(songObj) {
-              if(!songObj) {
-                didYTLookup = true;
-                // lookup song on youtube
-                const songResource = await Youtube.lookup(items[i].track.name, items[i].track.artists[0].name, msg).catch(() => {
+            });
+            if(!songObj) {
+              const songResource = await Youtube.lookup(items[i].track.name, items[i].track.artists[0].name, msg).catch(() => {
+                Songs.destroy({
+                  where: {
+                    SpotID: items[i].track.id,
+                  },
+                });
+              });
+              // If for some reason resource couldn't be made, skip to next iteration
+              if(!songResource) {
+                msg.channel.send('No Song Resource for song ' + items[i].track.id)
+                continue;
+              }
+              songObj = await Songs.create({
+                SpotID: items[i].track.id,
+                YTID: songResource.id.videoId,
+              });
+            }
+
+            const url = 'https://www.youtube.com/watch?v=' + songObj.YTID;
+            if(songObj.Include) {
+              // get song info, if unable to do so, delete entry, go next
+              const songInfo = await ytdl.getInfo(url).catch(() => {
                   Songs.destroy({
                     where: {
                       SpotID: items[i].track.id,
                     },
-                  }).then(() => {
-                    i++;
-                    if(i < items.length) {
-                      return setTimeout(songLoop, 1000);
-                    }
                   });
+              });
+              if(!songInfo || !songInfo.playerResponse) {
+                Songs.destroy({
+                  where: {
+                    SpotID: items[i].track.id,
+                  },
                 });
-                // name, artist
-                if(!songResource) {
-                  msg.channel.send('The youtube data cap has been hit. More songs can be added tomorrow.');
-                  i++;
-                  if(i < items.length) {
-                    return setTimeout(songLoop, 1000);
-                  }
-                  else{
-                    return;
-                  }
-                }
-                songObj = await Songs.create({
-                  SpotID: items[i].track.id,
-                  YTID: songResource.id.videoId,
-                });
+                continue;
               }
-
-              const url = 'https://www.youtube.com/watch?v=' + songObj.YTID;
-              // if the song shouldn't be included. Don't do anything else
-              if(songObj.Include) {
-                // url of song has been found. It has also been added to database if not already there.
-                const songInfo = await ytdl.getInfo(url).catch(() => {
-                    i++;
-                    if(i < items.length) {
-                      return setTimeout(songLoop, 1000);
-                    }
-                    else{
-                      return;
-                    }
-                });
-                if(!songInfo) {
-                  i++;
-                  if(i < items.length) {
-                    return setTimeout(songLoop, 1000);
-                  }
-                  else{
-                    return;
-                  }
+              const song = {
+                title: songInfo.playerResponse.videoDetails.title,
+                url: url,
+              };
+              if(i == 0) {
+                try{
+                  queueContract.songs.push(song);
                 }
-                const song = {
-                  title: songInfo.playerResponse.videoDetails.title,
-                  url: url,
-                };
-                console.log('i is ' + i);
-                if(i == 0) {
-                  try{
-                    queueContract.songs.push(song);
-                  }
+                catch (err) {
+                  queueGone = true;
+                  console.log('Queue was deleted');
+                  continue;
+                }
+                try{
+                  console.log('trying');
+                  const connection = await voiceChannel.join();
+                  queueContract.connection = connection;
+                  musicLib.play(msg.guild, queueContract.songs[0]);
+                }
                   catch (err) {
-                    return console.log('Queue was deleted');
-                  }
-                  try{
-                    console.log('trying');
-                    const connection = await voiceChannel.join();
-                    queueContract.connection = connection;
-                    musicLib.play(msg.guild, queueContract.songs[0]);
-                  }
-                    catch (err) {
-                    console.log(err);
-                    msg.client.queue.delete(msg.guild.id);
-                    return msg.channel.send(err);
-                  }
+                  console.log(err);
+                  msg.client.queue.delete(msg.guild.id);
+                  msg.channel.send(err);
+                  continue;
                 }
-                else{
-                  try{
-                    msg.client.queue.get(msg.guild.id).songs.push(song);
-                  }
-                    catch(err) {
-                    return console.log('Queue was deleted');
-                  }
-
-                  // console.log(msg.client.queue.get(msg.guild.id).songs);
-                }
-              }
-
-            });
-            i++;
-
-            if(i < items.length && msg.client.queue.get(msg.guild.id)) {
-              if(didYTLookup) {
-                setTimeout(songLoop, 1000);
               }
               else{
-                songLoop();
+                try{
+                  msg.client.queue.get(msg.guild.id).songs.push(song);
+                }
+                catch(err) {
+                  queueGone = true;
+                  console.log('Queue was deleted');
+                  continue;
+                }
+
+                // console.log(msg.client.queue.get(msg.guild.id).songs);
               }
             }
           }
-          songLoop();
+          // async function songLoop() {
+          //   console.log('i is ' + i);
+          //   if(i > items.length){
+          //     return;
+          //   }
+          //   /* for each item if the database has a link, procede with normal playback
+          //   if the database has no link, look up the song with youtube
+          //   */
+          //   let didYTLookup = false;
+          //   await Songs.findOne({
+          //     where: {
+          //       SpotID: items[i].track.id,
+          //     },
+          //   }).then(async function(songObj) {
+          //     if(!songObj) {
+          //       didYTLookup = true;
+          //       // lookup song on youtube
+          //       const songResource = await Youtube.lookup(items[i].track.name, items[i].track.artists[0].name, msg).catch(() => {
+          //         Songs.destroy({
+          //           where: {
+          //             SpotID: items[i].track.id,
+          //           },
+          //         }).then(() => {
+          //           return;
+          //         });
+          //       });
+          //       // name, artist
+          //       if(!songResource) {
+          //         msg.channel.send('No Song Resource for song ' + items[i].track.id);
+          //         //msg.channel.send('The youtube data cap has been hit. More songs can be added tomorrow.');
+          //
+          //       }
+          //       songObj = await Songs.create({
+          //         SpotID: items[i].track.id,
+          //         YTID: songResource.id.videoId,
+          //       });
+          //     }
+          //
+          //     const url = 'https://www.youtube.com/watch?v=' + songObj.YTID;
+          //     // if the song shouldn't be included. Don't do anything else
+          //     if(songObj.Include) {
+          //       // url of song has been found. It has also been added to database if not already there.
+          //       const songInfo = await ytdl.getInfo(url).catch(() => {
+          //           Songs.destroy({
+          //             where: {
+          //               SpotID: items[i].track.id,
+          //             },
+          //           });
+          //           return;
+          //       });
+          //       if(!songInfo || !songInfo.playerResponse) {
+          //         Songs.destroy({
+          //           where: {
+          //             SpotID: items[i].track.id,
+          //           },
+          //         });
+          //         return;
+          //       }
+          //       const song = {
+          //         title: songInfo.playerResponse.videoDetails.title,
+          //         url: url,
+          //       };
+          //
+          //       if(i == 0) {
+          //         try{
+          //           queueContract.songs.push(song);
+          //         }
+          //         catch (err) {
+          //           queueGone = true;
+          //           return console.log('Queue was deleted');
+          //         }
+          //         try{
+          //           console.log('trying');
+          //           const connection = await voiceChannel.join();
+          //           queueContract.connection = connection;
+          //           musicLib.play(msg.guild, queueContract.songs[0]);
+          //         }
+          //           catch (err) {
+          //           console.log(err);
+          //           msg.client.queue.delete(msg.guild.id);
+          //           return msg.channel.send(err);
+          //         }
+          //       }
+          //       else{
+          //         try{
+          //           msg.client.queue.get(msg.guild.id).songs.push(song);
+          //         }
+          //         catch(err) {
+          //           queueGone = true;
+          //           return console.log('Queue was deleted');
+          //         }
+          //
+          //         // console.log(msg.client.queue.get(msg.guild.id).songs);
+          //       }
+          //     }
+          //
+          //   }); //
+          //   if(queueGone == true){
+          //     return;
+          //   }
+          //   i++;
+          //
+          //   if(i < items.length && msg.client.queue.get(msg.guild.id)) {
+          //     if(didYTLookup) {
+          //       setTimeout(songLoop, 1000);
+          //     }
+          //     else{
+          //       songLoop();
+          //     }
+          //   }
+          // }
+          //songLoop();
         });
       });
     }
