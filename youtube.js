@@ -12,9 +12,9 @@ module.exports = {
         type: 'video',
         videoCatagoryId: '10'
       }
-    }).catch(err => console.log(err));
+    }).catch(err => console.log(err.statusText));
     //console.log(res);
-    
+
     let items = res.data.items;
     //console.log(items[0]);
     return items[0];

@@ -127,8 +127,8 @@ BotEnv.sync().then(() => {
         //const defaultChannel = bot.channels.get(process.env.DEFAULT);
 
         //Try to login to spotify using stored token
-        console.log('SPOTIFY TOKEN');
-        console.log(bot.env.SpotifyToken);
+        //console.log('SPOTIFY TOKEN');
+        //console.log(bot.env.SpotifyToken);
         if(bot.env.SpotifyToken != 'null'){
           Spotify.getRefreshToken(env.SpotifyToken, env).then(tokenArr => {
             bot.tokenArr = tokenArr;
@@ -203,8 +203,8 @@ BotEnv.sync().then(() => {
             return msg.channel.send('Something went wrong with the spotify Authentication. Please try again.');
           }
           bot.tokenArr = tokenArr;
-          console.log(tokenArr);
-          console.log(tokenArr[1].length);
+          //console.log(tokenArr);
+          //console.log(tokenArr[1].length);
           BotEnv.update({
             SpotifyToken: tokenArr[1]
           },
