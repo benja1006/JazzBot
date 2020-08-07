@@ -10,10 +10,10 @@ module.exports = {
     if(!msg.member.voice.channel){
       return msg.channel.send("You have to be in a voice channel to stop the song!");
     }
-    if(!serverQueue){
+    if(!serverQueue || !serverQueue.connection){
       return msg.channel.send("There is no song playing to stop");
     }
     serverQueue.songs = [];
     serverQueue.connection.dispatcher.end();
   },
-}
+};

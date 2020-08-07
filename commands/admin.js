@@ -7,21 +7,22 @@ module.exports = {
   cooldown: 0,
   reqMusic: false,
   modOnly: true,
-  execute(msg, args, isMod) {
+  execute(msg, args) {
     const bot = msg.client;
-    if(!args.length >= 1){
+    if(!args.length >= 1) {
       return msg.reply('Please include an admin command');
     }
-    let commandName = args.shift().toLowerCase();
-    if(!bot.adminCommands.has(commandName)){
+    const commandName = args.shift().toLowerCase();
+    if(!bot.adminCommands.has(commandName)) {
       return msg.reply(`That command does not exist. Try ${prefix}admin help for help`);
     }
     const command = bot.adminCommands.get(commandName);
     try{
       command.execute(msg, args);
-    } catch(err){
+    }
+      catch(err) {
       console.log(err);
       msg.reply('There was an error trying to execute that command!');
     }
   },
-}
+};

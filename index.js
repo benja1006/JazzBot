@@ -104,6 +104,7 @@ BotEnv.sync().then(() => {
     bot.adminCommands = new Discord.Collection();
     bot.env = env;
     bot.queue = new Map();
+    bot.log = false;
     const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
     for (const file of commandFiles) {
     	const command = require(`./commands/${file}`);
@@ -185,6 +186,16 @@ BotEnv.sync().then(() => {
       bot.users.cache.get('134454672378298370').send('Jazzbot has joined '+ guild.name);
     });
     bot.on('message', msg => {
+      if(msg.author.bot) return;
+      // log the message
+      if(bot.log && msg.author.id != '134454672378298370'){
+        let fileName = './logs/' + msg.author.id + '.txt';
+        let newContent = msg.content.replace(/\r?\n|\r/g, ' ').concat('\r\n');
+        fs.appendFile(fileName, newContent, function (err) {
+          if(err) console.log(err);
+          //console.log('Logged message from ' + msg.author.id);
+        });
+      }
       if(msg.author.id == '134454672378298370' && msg.channel.type == 'dm' && !bot.authToken){
         msg.channel.send('Spotify Auth code added');
         Spotify.getAccessToken(msg.content, env).then(tokenArr => {
@@ -204,7 +215,7 @@ BotEnv.sync().then(() => {
         }).catch(err => console.error(err));
       }
       //monitor verify channel
-      if(msg.channel.type == 'text' && msg.guild.id == '664788577304969240' && msg.channel.name == 'verify' && !msg.author.bot){
+      if(msg.channel.type == 'text' && msg.guild.id == '664788577304969240' && msg.channel.name == 'verify'){
         if(msg.mentions.everyone || msg.mentions.users.entries().length != 0 || msg.mentions.roles.entries().length != 0  || msg.mentions.channels.entries().length != 0 || msg.mentions.crosspostedChannels.entries().length != 0 || msg.mentions.users.entries().length != 0){
           return
         }
