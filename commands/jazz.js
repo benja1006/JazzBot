@@ -119,7 +119,7 @@ module.exports = {
                   }).then(() => {
                     i++;
                     if(i < items.length) {
-                      return songLoop();
+                      return setTimeout(songLoop, 1000);
                     }
                   });
                 });
@@ -128,7 +128,7 @@ module.exports = {
                   msg.channel.send('The youtube data cap has been hit. More songs can be added tomorrow.');
                   i++;
                   if(i < items.length) {
-                    return songLoop();
+                    return setTimeout(songLoop, 1000);
                   }
                   else{
                     return;
@@ -147,7 +147,7 @@ module.exports = {
                 const songInfo = await ytdl.getInfo(url).catch(() => {
                     i++;
                     if(i < items.length) {
-                      return songLoop();
+                      return setTimeout(songLoop, 1000);
                     }
                     else{
                       return;
@@ -156,7 +156,7 @@ module.exports = {
                 if(!songInfo) {
                   i++;
                   if(i < items.length) {
-                    return songLoop();
+                    return setTimeout(songLoop, 1000);
                   }
                   else{
                     return;
