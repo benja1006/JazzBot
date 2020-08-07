@@ -32,9 +32,8 @@ module.exports = {
     config.headers['Authorization'] = 'Basic ' + base64data;
 
     let res = await axios.post('https://accounts.spotify.com/api/token', qs.stringify(requestBody), config).catch(function(error) {
-      return console.log('An Error has occured in getting a spotify token');
-    }).catch(err => {
-      return false
+      console.log('An Error has occured in getting a spotify token');
+      return false;
     });
     const now = Date.now();
     let tokencd = now + res.data.expires_in;
@@ -62,7 +61,8 @@ module.exports = {
 
     let res = await axios.post('https://accounts.spotify.com/api/token', qs.stringify(requestBody), config).catch(function(error) {
       //console.log(error);
-      return console.log('An Error has occured in getting a refresh token');
+      console.log('An Error has occured in getting a refresh token');
+      return false;
     });
     const now = Date.now();
     let tokencd = now + res.data.expires_in;

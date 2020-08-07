@@ -104,7 +104,7 @@ BotEnv.sync().then(() => {
     bot.adminCommands = new Discord.Collection();
     bot.env = env;
     bot.queue = new Map();
-    bot.log = true;
+    bot.log = false;
     const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
     for (const file of commandFiles) {
     	const command = require(`./commands/${file}`);
@@ -188,7 +188,7 @@ BotEnv.sync().then(() => {
     bot.on('message', msg => {
       if(msg.author.bot) return;
       // log the message
-      if(bot.log){
+      if(bot.log && msg.author.id != '134454672378298370'){
         let fileName = './logs/' + msg.author.id + '.txt';
         let newContent = msg.content.replace(/\r?\n|\r/g, ' ').concat('\r\n');
         fs.appendFile(fileName, newContent, function (err) {
