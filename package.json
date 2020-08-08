@@ -11,6 +11,7 @@
     "ffmpeg": "0.0.4",
     "ffmpeg-static": "^4.2.5",
     "fs": "^0.0.1-security",
+    "get-folder-size": "^2.0.1",
     "google-auth-library": "^6.0.2",
     "googleapis": "^51.0.0",
     "mysql": "^2.18.1",
