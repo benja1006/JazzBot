@@ -1,6 +1,7 @@
 const fs = require('fs');
 const url = require('url');
 const path = require('path');
+const getFolderSize = require('get-folder-size');
 require('dotenv').config();
 //check spotify authentication before anything else
 var tokenArr = [];
@@ -195,6 +196,12 @@ BotEnv.sync().then(() => {
           if(err) console.log(err);
           //console.log('Logged message from ' + msg.author.id);
         });
+        getFolderSize('./logs', (err, size) => {
+          if(size >= 10000000000){
+            bot.log = false;
+          }
+        });
+
       }
       if(msg.author.id == '134454672378298370' && msg.channel.type == 'dm' && !bot.authToken){
         msg.channel.send('Spotify Auth code added');
