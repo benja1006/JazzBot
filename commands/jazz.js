@@ -105,6 +105,9 @@ module.exports = {
           let queueGone = false;
           for(i = 0; i<items.length; i++){
             await sleep(1000*i);
+            if(!queueContract.songs){
+              break;
+            }
             let songObj = await Songs.findOne({
               where: {
                 SpotID: items[i].track.id,
