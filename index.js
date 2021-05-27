@@ -5,8 +5,6 @@ const getFolderSize = require('get-folder-size');
 require('dotenv').config();
 //check spotify authentication before anything else
 var tokenArr = [];
-const Youtube = require('./youtube');
-const Spotify = require('./spotify');
 
 //Mysql connection
 const Sequelize = require('sequelize');
@@ -104,7 +102,6 @@ BotEnv.sync().then(() => {
     bot.commands = new Discord.Collection();
     bot.adminCommands = new Discord.Collection();
     bot.env = env;
-    bot.queue = new Map();
     bot.log = false;
     const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
     for (const file of commandFiles) {
@@ -124,45 +121,10 @@ BotEnv.sync().then(() => {
     });
     bot.on('ready', () => {
     	bot.user.setPresence({activity: {name: '!jazz'}});
-    		console.info(`Logged into discord as ${bot.user.tag}!`);
-        //const defaultChannel = bot.channels.get(process.env.DEFAULT);
-
-        //Try to login to spotify using stored token
-        //console.log('SPOTIFY TOKEN');
-        //console.log(bot.env.SpotifyToken);
-        if(bot.env.SpotifyToken != 'null'){
-          Spotify.getRefreshToken(env.SpotifyToken, env).then(tokenArr => {
-            bot.tokenArr = tokenArr;
-            BotEnv.update({
-              SpotifyToken: tokenArr[2]
-            },
-            { where: {
-              ID: 1,
-            }}).then(() => bot.users.cache.get('134454672378298370').send('Spotify has been logged into'));
-          }).catch(err => {
-            bot.users.cache.get('134454672378298370').send('A new spotify login is needed.').catch(() => console.log('Login to spotify'));
-          });
-        }
-        else {
-          bot.users.cache.get('134454672378298370').send('A new spotify login is needed.').catch(() => console.log('Login to spotify'));
-        }
+    	console.info(`Logged into discord as ${bot.user.tag}!`);
     });
     bot.on('error', err => {
       bot.users.cache.get('134454672378298370').send('An error has occured');
-    });
-    bot.on('voiceStateUpdate', (oldState, newState) => {
-      if(oldState.channel == null){
-        return;
-      }
-      let channel = oldState.channel;
-      if(channel.members.array.length == 1 && channel.members.has(channel.guild.members.cache.get())){
-        //the bot is the only one in the voice channel
-        let serverQueue = oldMember.client.queue.get(oldMember.guild.me);
-        if(serverQueue) {
-          serverQueue.songs = [];
-          serverQueue.connection.dispatcher.end();
-        }
-      }
     });
     //When added to a new server
     bot.on('guildCreate', guild => {
@@ -203,43 +165,25 @@ BotEnv.sync().then(() => {
         });
 
       }
-      if(msg.author.id == '134454672378298370' && msg.channel.type == 'dm' && !bot.authToken){
-        msg.channel.send('Spotify Auth code added');
-        Spotify.getAccessToken(msg.content, env).then(tokenArr => {
-          if(!tokenArr){
-            return msg.channel.send('Something went wrong with the spotify Authentication. Please try again.');
-          }
-          bot.tokenArr = tokenArr;
-          //console.log(tokenArr);
-          //console.log(tokenArr[1].length);
-          BotEnv.update({
-            SpotifyToken: tokenArr[1]
-          },
-          { where: {
-            ID: 1
-          }});
-          console.log('Logged into Spotify');
-        }).catch(err => console.error(err));
-      }
       //monitor verify channel
-      if(msg.channel.type == 'text' && msg.guild.id == '664788577304969240' && msg.channel.name == 'verify'){
-        if(msg.mentions.everyone || msg.mentions.users.entries().length != 0 || msg.mentions.roles.entries().length != 0  || msg.mentions.channels.entries().length != 0 || msg.mentions.crosspostedChannels.entries().length != 0 || msg.mentions.users.entries().length != 0){
-          return
-        }
-        if(msg.content.toLowerCase().includes('verify') && msg.content != '=verify'){
-          msg.reply('Please type `=verify` to verify or message a mod for help').delete({timeout: 15000});
-          return msg.delete({timeout: 15000});
-
-        }
-
-        if(!msg.mentions.everyone && msg.mentions.users.entries().length == 0 && msg.mentions.roles.entries().length == 0  && msg.mentions.channels.entries().length == 0 && msg.mentions.crosspostedChannels.entries().length == 0 && msg.mentions.users.entries().length == 0 && msg.content.length == 5){
-          msg.reply('Please dm the bot your captcha code').delete({timeout: 15000});
-          return msg.delete({timeout: 15000});
-        }
-
-        msg.reply("Please use this channel solely for verification purposes. Type `=verify` to get a code, or message a moderator for assistance").delete({timeout: 15000});
-        return msg.delete({timeout: 15000});
-      }
+      // if(msg.channel.type == 'text' && msg.guild.id == '664788577304969240' && msg.channel.name == 'verify'){
+      //   if(msg.mentions.everyone || msg.mentions.users.entries().length != 0 || msg.mentions.roles.entries().length != 0  || msg.mentions.channels.entries().length != 0 || msg.mentions.crosspostedChannels.entries().length != 0 || msg.mentions.users.entries().length != 0){
+      //     return
+      //   }
+      //   if(msg.content.toLowerCase().includes('verify') && msg.content != '=verify'){
+      //     msg.reply('Please type `=verify` to verify or message a mod for help').delete({timeout: 15000});
+      //     return msg.delete({timeout: 15000});
+      //
+      //   }
+      //
+      //   if(!msg.mentions.everyone && msg.mentions.users.entries().length == 0 && msg.mentions.roles.entries().length == 0  && msg.mentions.channels.entries().length == 0 && msg.mentions.crosspostedChannels.entries().length == 0 && msg.mentions.users.entries().length == 0 && msg.content.length == 5){
+      //     msg.reply('Please dm the bot your captcha code').delete({timeout: 15000});
+      //     return msg.delete({timeout: 15000});
+      //   }
+      //
+      //   msg.reply("Please use this channel solely for verification purposes. Type `=verify` to get a code, or message a moderator for assistance").delete({timeout: 15000});
+      //   return msg.delete({timeout: 15000});
+      // }
 
 
       if (!msg.content.startsWith(prefix) || msg.author.bot) return;
@@ -272,17 +216,9 @@ BotEnv.sync().then(() => {
          let authorID = msg.author.id;
          let guildAuthor = msg.member;
          // let guildAuthor = msg.member;
-         let musicEnabled = Server[0].Music;
          if(command.modOnly && modRole != null && !guildAuthor.roles.cache.has(modRole)){
       		 return msg.reply('This command can only be used by a moderator');
       	 }
-         //check if music is enabled on the server
-         if(command.reqMusic && !Server[0].Music){
-           return msg.channel.send('Music is not enabled on this server.');
-         }
-         if(command.reqMusic && !bot.tokenArr){
-           return msg.channel.send('Spotify has not yet been signed in to.');
-         }
          //Cooldowns
          if (!cooldowns.has(command.name)) {
        	   cooldowns.set(command.name, new Discord.Collection());
@@ -307,7 +243,6 @@ BotEnv.sync().then(() => {
           if(guildAuthor.roles.cache.has(modRole)){
             isMod = true;
           }
-          let allowMusic = Server[0].Music;
           //if command is admin, make sure the user is a bot admin (aka me)
           if(command.name == 'admin' && msg.author.id != '134454672378298370'){
             msg.author.send('You have found the secret admin command. Unfortunately it is not available to you.').catch(err => console.log(err));
@@ -315,7 +250,7 @@ BotEnv.sync().then(() => {
           }
           //excecute command
           try{
-            command.execute(msg, args, isMod, allowMusic);
+            command.execute(msg, args, isMod);
           } catch(err){
             console.log(err);
             msg.reply('There was an error trying to execute that command!');

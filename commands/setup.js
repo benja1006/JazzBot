@@ -39,9 +39,6 @@ module.exports = {
       ManagerRole: {
         type: Sequelize.BIGINT(18),
         autoIncrement: false
-      },
-      Music: {
-        type: Sequelize.BOOLEAN,
       }
     }, {
       sequelize,
@@ -145,47 +142,6 @@ module.exports = {
                   msg.channel.send("You have updated the suggest channel for the server.")
                 }).catch(msg.channel.send("This is not a valid channel id"));
                 return;
-              }
-            case 'togglemusic':
-            case 'allowmusic':
-            case 'music':
-              console.log('running case music');
-              let newMusic = false;
-              if(args.length == 1){
-                if(!Server[0].Music){
-                  newMusic = true;
-                }
-              }
-              if(args.length == 2){
-                if(JSON.parse(args[1])){
-                  if(Server[0].Music){
-                    msg.channel.send('Music is already enabled on this server.');
-                    newMusic = true;
-                  }
-                  else{
-                    msg.channel.send('Music has been enabled on this server.');
-                    newMusic = true;
-                  }
-                }
-                if(!JSON.parse(args[1])){
-                  if(!Server[0].Music){
-                    msg.channel.send('Music is already disabled on this server.');
-                  }
-                  else{
-                    msg.channel.send('Music has been disabled on this server.');
-                  }
-                }
-                if(args[1] != 'true' && args[1] != 'false'){
-                  msg.channel.send('Please only include either true or false or neither to switch the current setting.');
-                }
-              }
-              if(newMusic != Server[0].Music){
-                Servers.update({
-                  Music: newMusic
-                },
-                { where: {
-                  Server: msg.guild.id
-                }}).then(() => console.log('Music has been updated'));
               }
           }
         }
