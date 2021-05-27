@@ -8,7 +8,6 @@ module.exports = {
   cooldown: 300,
   guildOnly: true,
   modOnly: false,
-  reqMusic: false,
   execute(msg, args, isMod) {
     if(args.length == 0){
       return msg.author.send("Please include a message in your suggestion");
@@ -45,9 +44,6 @@ module.exports = {
       ManagerRole: {
         type: Sequelize.BIGINT(18),
         autoIncrement: false
-      },
-      Music: {
-        type: Sequelize.BOOLEAN,
       }
     }, {
       sequelize,
