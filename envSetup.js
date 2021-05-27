@@ -2,10 +2,10 @@ const Sequelize = require('sequelize');
 require('dotenv').config();
 const SQLUSERNAME = process.env.SQLUSERNAME;
 const SQLPASSWORD = process.env.SQLPASSWORD;
-cont DisToken = process.env.DISTOKEN;
+const DisToken = process.env.DISTOKEN;
 const Model = Sequelize.Model;
 const sequelize = new Sequelize('jazzbot', SQLUSERNAME, SQLPASSWORD, {
-  host: 'mysql',
+  host: 'localhost',
   dialect: 'mysql'
 });
 sequelize

@@ -64,22 +64,7 @@ BotEnv.init({
   DisToken: {
     type: Sequelize.STRING(59),
     autoIncrement: false
-  },
-  YTKey: {
-    type: Sequelize.STRING(59),
-    autoIncrement: false
-  },
-  SpotifyID: {
-    type: Sequelize.STRING(59),
-    autoIncrement: false
-  },
-  SpotifySecret: {
-    type: Sequelize.STRING(59),
-    autoIncrement: false
-  },
-  SpotifyToken: {
-    type: Sequelize.STRING(150),
-  },
+  }
 }, {
   sequelize,
   modelName: 'BotEnv'
