@@ -46,9 +46,6 @@ Servers.init({
   ManagerRole: {
     type: Sequelize.BIGINT(18),
     autoIncrement: false
-  },
-  Music: {
-    type: Sequelize.BOOLEAN,
   }
 }, {
   sequelize,
