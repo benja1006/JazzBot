@@ -5,7 +5,6 @@ module.exports = {
   aliases: [''],
   usage: ['admin command'],
   cooldown: 0,
-  reqMusic: false,
   modOnly: true,
   execute(msg, args) {
     const bot = msg.client;

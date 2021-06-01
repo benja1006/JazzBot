@@ -6,7 +6,6 @@ module.exports = {
   usage: ['setup (id)'],
   cooldown: 5,
   modOnly: true,
-  reqMusic: false,
   execute(msg, args, isMod) {
     const SQLUSERNAME = process.env.SQLUSERNAME;
     const SQLPASSWORD = process.env.SQLPASSWORD;

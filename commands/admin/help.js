@@ -5,7 +5,6 @@ module.exports = {
   aliases: ['commands'],
   usage: ['command name'],
   cooldown: 5,
-  reqMusic: false,
   execute(msg, args) {
     const data = [];
     const commands = msg.client.adminCommands;

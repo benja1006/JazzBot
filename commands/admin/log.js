@@ -3,7 +3,6 @@ module.exports = {
   description: 'Used to toggle logging',
   aliases: [''],
   usage: ['log true/false'],
-  reqMusic: false,
   execute(msg, args) {
     switch(args[0]){
       case 'on':
