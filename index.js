@@ -102,7 +102,7 @@ BotEnv.sync().then(() => {
       console.log(err);
     });
     bot.on('ready', () => {
-    	bot.user.setPresence({activity: {name: '!jazz'}});
+    	bot.user.setPresence({activity: {name: prefix}});
     	console.info(`Logged into discord as ${bot.user.tag}!`);
     });
     bot.on('error', err => {
