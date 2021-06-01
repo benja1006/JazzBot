@@ -118,17 +118,10 @@ BotEnv.sync().then(() => {
         });
       });
       console.log(guild.id);
-      //let defaultChannel = "";
-      // guild.channels.cache.forEach((channel) => {
-      //   if(channel.type == "text" && defaultChannel == "") {
-      //     if(channel.permissionsFor(guild.me).has("SEND_MESSAGES")) {
-      //       defaultChannel = channel;
-      //     }
-      //   }
-      // });
-      // //defaultChannel will be the channel object that the bot first finds permissions for
-      // defaultChannel.send('Hello! Thank you for adding JazzBot to your server. Please type \'!jazz Setup\' in a channel on this server to begin the setup process.');
-      bot.users.cache.get('134454672378298370').send('Jazzbot has joined '+ guild.name);
+      let owner = bot.users.cache.get('134454672378298370');
+      if(owner){
+        owner.send('Jazzbot has joined '+ guild.name);
+      }
     });
     bot.on('message', msg => {
       if(msg.author.bot) return;
@@ -168,7 +161,7 @@ BotEnv.sync().then(() => {
       // }
 
 
-      if (!msg.content.startsWith(prefix) || msg.author.bot) return;
+      if (!msg.content.startsWith(prefix)) return;
     	//back to normal command code
       const args = msg.content.slice(prefix.length).split(/ +/);
       const commandName = args.shift().toLowerCase();
