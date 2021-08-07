@@ -1,9 +1,18 @@
+
 module.exports = {
   name: 'export',
   description: 'Exports data from the mysql server',
   aliases: [''],
   usage: ['export dataset'],
   execute(msg, args) {
+    const Sequelize = require('sequelize');
+    const SQLUSERNAME = process.env.SQLUSERNAME;
+    const SQLPASSWORD = process.env.SQLPASSWORD;
+    const Model = Sequelize.Model;
+    const sequelize = new Sequelize('jazzbot', SQLUSERNAME, SQLPASSWORD, {
+      host: 'mysql',
+      dialect: 'mysql'
+    });
     class Servers extends Model {}
     Servers.init({
       ID: {
@@ -36,8 +45,11 @@ module.exports = {
     switch(type){
       case "servers":
         Servers.sync().then(
-          Servers.findAll().then(Server => {
-            for (Server in Servers){
+          Servers.findAll().then(Serverlist => {
+            //console.log(Serverlist)
+            for (i in Serverlist){
+              Server = Serverlist[i]
+              console.log(Server)
               msg.channel.send(Server.ID + ", " + Server.Server + ", " + Server.General + ", " + Server.Suggest + ", " + Server.ManagerRole);
             }
           })

@@ -70,25 +70,33 @@ module.exports = {
         for(i = 1; i<args.length; i++){
           suggestion = suggestion.concat(" ", args[i]);
         }
+
+        let tag = ''
+        let id = ''
         if(!slash){
           msg.delete();
-          const author = msg.author;
+          tag = msg.author.tag;
+          id = msg.author.id;
+          msg.author.send("Thank you for your suggestion. It has been forwarded to the mod team!")
+        } else{
+          tag = msg.user.tag;
+          id = msg.user.id;
+          msg.reply({content: "Thank you for your suggestion. It has been forwarded to the mod team!", ephemeral: true}).catch();
         }
         let isMod = false;
-        const author = msg.user;
         let modRole = Server[0].ManagerRole;
         if(modRole != null && msg.member.roles.cache.has(modRole)){
           isMod = true;
         }
-        msg.reply({content: "Thank you for your suggestion. It has been forwarded to the mod team!", ephemeral: true}).catch();
+
 
         const suggestionEmbed = {
           color: 0x34ebde,
-          title: "Suggestion by " + author.tag.toString(),
+          title: "Suggestion by " + tag,
           fields: [
             {
               name: 'UserID',
-              value: author.id,
+              value: id,
             },
             {
               name: 'Suggestion',
