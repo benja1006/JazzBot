@@ -49,19 +49,6 @@ module.exports = {
    if (msg.channel.type === 'GUILD_TEXT'){
      msg.delete();
    }
-   const suggestionEmbed = {
-     color: 0x41444a,
-     title: 'Help',
-     field: []
-   }
-   for(string in data){
-     suggestionEmbed.field.push({
-       name: '',
-       value: string,
-       inline: true
-     });
-   }
-   console.log(suggestionEmbed)
-   return msg.channel.send({embeds: [suggestionEmbed], ephemeral: true});
+   return msg.channel.send(data.join('\n'));
  },
 };
