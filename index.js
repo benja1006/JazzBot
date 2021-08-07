@@ -78,7 +78,12 @@ BotEnv.sync().then(() => {
     // SpotifySecret = env[0].SpotifySecret;
     //discord setup
     const Discord = require('discord.js');
-    const bot = new Discord.Client();
+    const bot = new Discord.Client({
+      intents: [Discord.Intents.FLAGS.GUILD_MESSAGES,
+                Discord.Intents.FLAGS.DIRECT_MESSAGES,
+                Discord.Intents.FLAGS.GUILDS,
+                Discord.Intents.FLAGS.GUILD_PRESENCES]
+    });
     const cooldowns = new Discord.Collection();
     const prefix = process.env.PREFIX + ' ';
     bot.commands = new Discord.Collection();
@@ -123,7 +128,22 @@ BotEnv.sync().then(() => {
         owner.send('Jazzbot has joined '+ guild.name);
       }
     });
-    bot.on('message', msg => {
+    bot.on('interactionCreate', interaction => {
+      if(interaction.isCommand()){
+        if(interaction.commandName == 'suggest') {
+          command = bot.commands.get(interaction.commandName)
+          args = [interaction.options.get('suggestion')['value']]
+          try{
+            command.execute(interaction, args, false, true)
+          } catch(err){
+            console.log(err);
+            msg.reply('There was an error trying to execute that command!');
+          }
+        }
+
+      }
+    });
+    bot.on('messageCreate', msg => {
       if(msg.author.bot) return;
       // log the message
       if(bot.log && msg.author.id != '134454672378298370'){
@@ -140,26 +160,6 @@ BotEnv.sync().then(() => {
         });
 
       }
-      //monitor verify channel
-      // if(msg.channel.type == 'text' && msg.guild.id == '664788577304969240' && msg.channel.name == 'verify'){
-      //   if(msg.mentions.everyone || msg.mentions.users.entries().length != 0 || msg.mentions.roles.entries().length != 0  || msg.mentions.channels.entries().length != 0 || msg.mentions.crosspostedChannels.entries().length != 0 || msg.mentions.users.entries().length != 0){
-      //     return
-      //   }
-      //   if(msg.content.toLowerCase().includes('verify') && msg.content != '=verify'){
-      //     msg.reply('Please type `=verify` to verify or message a mod for help').delete({timeout: 15000});
-      //     return msg.delete({timeout: 15000});
-      //
-      //   }
-      //
-      //   if(!msg.mentions.everyone && msg.mentions.users.entries().length == 0 && msg.mentions.roles.entries().length == 0  && msg.mentions.channels.entries().length == 0 && msg.mentions.crosspostedChannels.entries().length == 0 && msg.mentions.users.entries().length == 0 && msg.content.length == 5){
-      //     msg.reply('Please dm the bot your captcha code').delete({timeout: 15000});
-      //     return msg.delete({timeout: 15000});
-      //   }
-      //
-      //   msg.reply("Please use this channel solely for verification purposes. Type `=verify` to get a code, or message a moderator for assistance").delete({timeout: 15000});
-      //   return msg.delete({timeout: 15000});
-      // }
-
 
       if (!msg.content.startsWith(prefix)) return;
     	//back to normal command code
@@ -176,7 +176,8 @@ BotEnv.sync().then(() => {
 
 
        //executing command
-       if (msg.channel.type !== 'text') {
+       //console.log(msg.channel.type)
+       if (msg.channel.type !== 'GUILD_TEXT') {
        	return msg.reply('I can\'t execute that command inside DMs!');
        }
        Servers.findAll({

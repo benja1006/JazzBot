@@ -12,12 +12,12 @@ module.exports = {
       data.push('Here\'s a list of all my admin commands:');
       data.push(commands.map(command => command.name).join(', '));
       data.push(`\nYou can send \`${prefix}admin help [command name]\` to get info on a specific command!`);
-      if (msg.channel.type === 'text'){
+      if (msg.channel.type === 'GUILD_TEXT'){
         msg.delete();
       }
-      msg.author.send(data, { split: true })
+      msg.reply({content: data.join('\n'), ephemeral: true})
 	    .then(() => {
-		       if (msg.channel.type === 'dm') return;
+		       if (msg.channel.type === 'DM') return;
 	    })
 	    .catch(error => {
 		      console.error(`Could not send help DM to ${msg.author.tag}.\n`, error);
@@ -30,10 +30,10 @@ module.exports = {
     const command = commands.get(name) || commands.find(c => c.aliases && c.aliases.includes(name));
 
     if (!command) {
-      if (msg.channel.type === 'text'){
+      if (msg.channel.type === 'GUILD_TEXT'){
         msg.delete();
       }
-        return msg => msg.channel.send('that\'s not a valid command!');
+        return msg => msg.reply({content: name + ' is not a valid command!', ephemeral: true});
       }
 
     data.push(`Name: ${command.name}`);
@@ -44,9 +44,9 @@ module.exports = {
 
     data.push(`Cooldown: ${command.cooldown || 3} second(s)`);
 
-   if (msg.channel.type === 'text'){
+   if (msg.channel.type === 'GUILD_TEXT'){
      msg.delete();
    }
-   return msg.channel.send(data, { split: true });
+   return msg.channel.send({content: data.join('\n'), ephemeral: true});
  },
 };

@@ -82,7 +82,7 @@ module.exports = {
               break;
             case 'general':
               if(args.length == 1){
-                if(msg.channel.type != 'text'){
+                if(msg.channel.type != 'GUILD_TEXT'){
                   return msg.channel.send("Please use this either in the general channel, or followed by the id of the general channel");
                 }
                 Servers.update({
@@ -118,7 +118,7 @@ module.exports = {
             case 'suggestions':
             case 'suggest':
               if(args.length == 1){
-                if(msg.channel.type != 'text'){
+                if(msg.channel.type != 'GUILD_TEXT'){
                   return msg.channel.send("Please use this either in the suggest channel, or followed by the id of the suggest channel");
                 }
                 Servers.update({

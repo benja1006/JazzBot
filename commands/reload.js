@@ -5,12 +5,12 @@ module.exports = {
   modOnly: true,
   execute(msg, args) {
     if (!args.length) return msg.channel.send(`You didn't pass any command to reload, ${msg.author}!`);
-    const commandName = args[0].toLowerCase();
+    let commandName = args[0].toLowerCase();
     if (commandName == 'reload') return msg.channel.send('Cannot reload the \`reload\` command');
     const command = msg.client.commands.get(commandName) || msg.client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
-
     if (!command) return msg.channel.send(`There is no command with name or alias \`${commandName}\`, ${msg.author}!`);
 
+    commandName = command.name
 
     delete require.cache[require.resolve(`./${commandName}.js`)];
     try {

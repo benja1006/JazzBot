@@ -8,7 +8,7 @@ module.exports = {
   cooldown: 300,
   guildOnly: true,
   modOnly: false,
-  execute(msg, args, isMod) {
+  execute(msg, args, isMod, slash) {
     if(args.length == 0){
       return msg.author.send("Please include a message in your suggestion");
     }
@@ -66,18 +66,29 @@ module.exports = {
           return msg.reply("The suggest channel has been incorrectly setup on this server. Please contact a mod for help.");
         }
         var suggestion = args[0];
+        //console.log(args)
         for(i = 1; i<args.length; i++){
           suggestion = suggestion.concat(" ", args[i]);
         }
-        msg.delete();
-        msg.author.send("Thank you for your suggestion. It has been forwarded to the mod team!").catch();
+        if(!slash){
+          msg.delete();
+          const author = msg.author;
+        }
+        let isMod = false;
+        const author = msg.user;
+        let modRole = Server[0].ManagerRole;
+        if(modRole != null && msg.member.roles.cache.has(modRole)){
+          isMod = true;
+        }
+        msg.reply({content: "Thank you for your suggestion. It has been forwarded to the mod team!", ephemeral: true}).catch();
+
         const suggestionEmbed = {
           color: 0x34ebde,
-          title: "Suggestion by " + msg.author.tag,
+          title: "Suggestion by " + author.tag.toString(),
           fields: [
             {
               name: 'UserID',
-              value: msg.author.id,
+              value: author.id,
             },
             {
               name: 'Suggestion',
@@ -88,7 +99,7 @@ module.exports = {
         if(isMod){
           suggestionEmbed.color = 0xde2121;
         }
-        msg.guild.channels.cache.get(suggestID).send({ embed: suggestionEmbed});
+        msg.guild.channels.cache.get(suggestID).send({ embeds: [suggestionEmbed]});
       });
     });
 
