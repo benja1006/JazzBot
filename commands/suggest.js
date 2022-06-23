@@ -70,7 +70,7 @@ module.exports = {
         for(i = 1; i<args.length; i++){
           suggestion = suggestion.concat(" ", args[i]);
         }
-
+        let modRole = Server[0].ManagerRole;
         let tag = ''
         let id = ''
         if(!slash){
@@ -82,11 +82,9 @@ module.exports = {
           tag = msg.user.tag;
           id = msg.user.id;
           msg.reply({content: "Thank you for your suggestion. It has been forwarded to the mod team!", ephemeral: true}).catch();
-        }
-        let isMod = false;
-        let modRole = Server[0].ManagerRole;
-        if(modRole != null && msg.member.roles.cache.has(modRole)){
-          isMod = true;
+          if(msg.member.roles.cache.has(modRole)){
+            isMod = true;
+          }
         }
 
 

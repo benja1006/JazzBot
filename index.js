@@ -72,11 +72,6 @@ BotEnv.sync().then(() => {
       ID: 1
     }
   }).then(env => {
-    // DisToken = env[0].DisToken;
-    // YTKey = env[0].YTKey;
-    // SpotifyID = env[0].SpotifyID;
-    // SpotifySecret = env[0].SpotifySecret;
-    //discord setup
     const Discord = require('discord.js');
     const bot = new Discord.Client({
       intents: [Discord.Intents.FLAGS.GUILD_MESSAGES,
@@ -191,8 +186,11 @@ BotEnv.sync().then(() => {
          let modRole = Server[0].ManagerRole;
          let authorID = msg.author.id;
          let guildAuthor = msg.member;
-         // let guildAuthor = msg.member;
-         if(command.modOnly && modRole != null && !guildAuthor.roles.cache.has(modRole)){
+         let isMod = false;
+         if(guildAuthor.roles.cache.has(modRole)){
+           isMod = true;
+         }
+         if(command.modOnly && modRole != null && !isMod){
       		 return msg.reply('This command can only be used by a moderator');
       	 }
          //Cooldowns
@@ -215,10 +213,7 @@ BotEnv.sync().then(() => {
           timestamps.set(msg.author.id, now);
           setTimeout(() => timestamps.delete(msg.author.id), cooldownAmount);
           //check if the user calling the command is a mod
-          let isMod = false;
-          if(guildAuthor.roles.cache.has(modRole)){
-            isMod = true;
-          }
+
           //if command is admin, make sure the user is a bot admin (aka me)
           if(command.name == 'admin' && msg.author.id != '134454672378298370'){
             msg.author.send('You have found the secret admin command. Unfortunately it is not available to you.').catch(err => console.log(err));
