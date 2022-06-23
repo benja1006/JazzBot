@@ -57,12 +57,35 @@ module.exports = {
                   let tempArr = []
                   res.on('data', (data) => {
                     parse(data, {columns: ['Server', 'General', 'Suggest', 'ManagerRole']}, (err, rows) => {
-                      serverArr.push(rows)
+                      for(row in rows){
+                        serverArr.push(row)
+                      }
                     });
                   })
                   file.on('finish', () =>{
                     file.close()
+                    //serverArr is now ready
                     console.log(serverArr)
+                      for(let item in serverArr){
+                        alreadyExists = false
+                        for(Server in Serverlist){
+                          if(item['Server'] == Server.Server){
+                            console.log(item['Server'])
+                            console.log(Server.Server)
+                            alreadyExists = true
+                            break
+                          }
+                        }
+                        if(!alreadyExists){
+                          console.log('Adding server: ' + item['Server'])
+                          Servers.create({
+                            Server: item['Server'],
+                            General: item['General'],
+                            Suggest: item['Suggest'],
+                            ManagerRole: item['ManagerRole']
+                          })
+                        }
+                      }
                   })
                 })
               }
