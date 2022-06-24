@@ -1,5 +1,5 @@
 const prefix = process.env.PREFIX + ' ';
-const Discord = require('discord.js');
+const { SlashCommandBuilder } = require('@discordjs/builders');
 module.exports = {
   name: 'suggest',
   description: 'Suggest something to the Moderators',
@@ -8,10 +8,14 @@ module.exports = {
   cooldown: 300,
   guildOnly: true,
   modOnly: false,
-  execute(msg, args, isMod, slash) {
-    if(args.length == 0){
-      return msg.author.send("Please include a message in your suggestion");
-    }
+  data: new SlashCommandBuilder()
+    .setName('suggest')
+    .setDescription('Make a suggestion for the mods.')
+    .addStringOption(option =>
+      option.setName('suggestion')
+            .setDescription('The suggestion text')
+            .setRequired(true))),
+  execute(interaction, isMod) {
     //connect to mysql server
     const Sequelize = require('sequelize');
     const SQLUSERNAME = process.env.SQLUSERNAME;
@@ -52,7 +56,7 @@ module.exports = {
     Servers.sync().then(() => {
       Servers.findAll({
         where: {
-          Server: msg.guild.id
+          Server: interaction.guild.id
         }
       }).then(Server => {
         if(!Server[0]){
@@ -60,34 +64,17 @@ module.exports = {
         }
         suggestID = Server[0].Suggest;
         if(suggestID == null){
-          return msg.reply("Suggestions are not yet enabled on this server.");
+          return interaction.reply({content: 'Suggestions are not yet enabled on this server.', ephemeral:true});
         }
-        if(msg.guild.channels.cache.get(!suggestID)){
-          return msg.reply("The suggest channel has been incorrectly setup on this server. Please contact a mod for help.");
+        if(interaction.guild.channels.cache.get(!suggestID)){
+          return interaction.reply("The suggest channel has been incorrectly setup on this server. Please contact a mod for help.");
         }
-        var suggestion = args[0];
+        var suggestion = interaction.options.get('suggestion')['value'];
         //console.log(args)
-        for(i = 1; i<args.length; i++){
-          suggestion = suggestion.concat(" ", args[i]);
-        }
         let modRole = Server[0].ManagerRole;
-        let tag = ''
-        let id = ''
-        if(!slash){
-          msg.delete();
-          tag = msg.author.tag;
-          id = msg.author.id;
-          msg.author.send("Thank you for your suggestion. It has been forwarded to the mod team!")
-        } else{
-          tag = msg.user.tag;
-          id = msg.user.id;
-          msg.reply({content: "Thank you for your suggestion. It has been forwarded to the mod team!", ephemeral: true}).catch();
-          if(msg.member.roles.cache.has(modRole)){
-            isMod = true;
-          }
-        }
-
-
+        let tag = interaction.user.tag;
+        let id = interaction.user.id;
+        interaction.reply({content: "Thank you for your suggestion. It has been forwarded to the mod team!", ephemeral: true}).catch();
         const suggestionEmbed = {
           color: 0x34ebde,
           title: "Suggestion by " + tag,
@@ -106,12 +93,7 @@ module.exports = {
           suggestionEmbed.color = 0xde2121;
         }
         msg.guild.channels.cache.get(suggestID).send({ embeds: [suggestionEmbed]}).catch(err => {
-          if(!slash){
-            msg.author.send("Jazzbot doesn't have access to the suggest channel on this server. Please DM a mod to let them know.");
-          }
-          else{
-            msg.user.send("Jazzbot doesn't have access to the suggest channel on this server. Please DM a mod to let them know.");
-          }
+          interaction.user.send("Jazzbot doesn't have access to the suggest channel on this server. Please DM a mod to let them know.");
         });
       });
     });

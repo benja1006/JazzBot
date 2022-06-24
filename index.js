@@ -133,17 +133,52 @@ BotEnv.sync().then(() => {
     });
     bot.on('interactionCreate', interaction => {
       if(interaction.isCommand()){
-        if(interaction.commandName == 'suggest') {
-          command = bot.commands.get(interaction.commandName)
-          args = [interaction.options.get('suggestion')['value']]
-          try{
-            command.execute(interaction, args, false, true)
-          } catch(err){
-            console.log(err);
-            msg.reply('There was an error trying to execute that command!');
-          }
-        }
+        const {commandName} = interaction;
+        const command = bot.commands.get(commandName);
 
+        if(!command) return;
+
+        //isMod
+        Servers.sync().then(() => {
+          Servers.findAll({
+            where: {
+              Server: interaction.guild.id
+            }
+          }).then(Server => {
+            if(!Server[0]){
+              return interaction.reply({content: 'This server has been improperly set up. Please kick the bot and re-add it.', ephemeral:true});
+            }
+            let modRole = Server[0].ManagerRole;
+            const isMod = interaction.member.roles.cache.has(modRole);
+            //Cooldowns
+            if (!cooldowns.has(command.name)) {
+              cooldowns.set(command.name, new Discord.Collection());
+             }
+
+             const now = Date.now();
+             const timestamps = cooldowns.get(command.name);
+             const cooldownAmount = (command.cooldown || 3) * 1000;
+             //if cooldown is running and author is not mod
+             if (timestamps.has(interaction.user.id) && !isMod) {
+               const expirationTime = timestamps.get(interaction.user.id) + cooldownAmount;
+
+                if (now < expirationTime) {
+                    const timeLeft = (expirationTime - now) / 1000;
+                    return interaction.reply({content: `Please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`, ephemeral:true});
+                }
+             }
+             timestamps.set(interaction.user.id, now);
+             setTimeout(() => timestamps.delete(interaction.user.id), cooldownAmount);
+
+             //Run command
+            try{
+              command.execute(interaction, isMod);
+            } catch(err){
+              console.log(err);
+              await interaction.reply({content: 'There was an error trying to execute that command!', ephemeral:true});
+            }
+          });
+        });
       }
     });
     bot.on('messageCreate', msg => {
@@ -161,81 +196,11 @@ BotEnv.sync().then(() => {
             bot.log = false;
           }
         });
-
       }
-
-      if (!msg.content.startsWith(prefix)) return;
-    	//back to normal command code
-      const args = msg.content.slice(prefix.length).split(/ +/);
-      const commandName = args.shift().toLowerCase();
-      console.info(`${msg.author.username} Called command: ${commandName}`);
-      //check if command doesn't exist
-      if (!bot.commands.has(commandName)){
-        msg.author.send(`That command doesn't exist. try ${prefix}help for help`)
-        return;
+      if(msg.content == '!jazz register' && msg.author.id = '134454672378298370' ){
+        const command = bot.adminCommands.get('registercmds');
+        command.execute(msg, true, false);
       }
-      //cooldown code
-      const command = bot.commands.get(commandName);
-
-
-       //executing command
-       //console.log(msg.channel.type)
-       if (msg.channel.type !== 'GUILD_TEXT') {
-       	return msg.reply('I can\'t execute that command inside DMs!');
-       }
-       Servers.findAll({
-         where: {
-           Server: msg.guild.id
-         }
-       }).then(Server => {
-         if(!Server[0]){
-           return msg.reply("This server hasn't been setup properly. Please kick the bot and re add it.");
-         }
-         let modRole = Server[0].ManagerRole;
-         let authorID = msg.author.id;
-         let guildAuthor = msg.member;
-         let isMod = false;
-         if(guildAuthor.roles.cache.has(modRole)){
-           isMod = true;
-         }
-         if(command.modOnly && modRole != null && !isMod){
-      		 return msg.reply('This command can only be used by a moderator');
-      	 }
-         //Cooldowns
-         if (!cooldowns.has(command.name)) {
-       	   cooldowns.set(command.name, new Discord.Collection());
-          }
-
-          const now = Date.now();
-          const timestamps = cooldowns.get(command.name);
-          const cooldownAmount = (command.cooldown || 3) * 1000;
-          //if cooldown is running and author is not mod
-          if (timestamps.has(msg.author.id) && !guildAuthor.roles.cache.has(modRole)) {
-       	    const expirationTime = timestamps.get(msg.author.id) + cooldownAmount;
-
-       	     if (now < expirationTime) {
-       		       const timeLeft = (expirationTime - now) / 1000;
-       		       return msg.reply(`Please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`);
-       	     }
-          }
-          timestamps.set(msg.author.id, now);
-          setTimeout(() => timestamps.delete(msg.author.id), cooldownAmount);
-          //check if the user calling the command is a mod
-
-          //if command is admin, make sure the user is a bot admin (aka me)
-          if(command.name == 'admin' && msg.author.id != '134454672378298370'){
-            msg.author.send('You have found the secret admin command. Unfortunately it is not available to you.').catch(err => console.log(err));
-            msg.delete();
-          }
-          //excecute command
-          try{
-            command.execute(msg, args, isMod);
-          } catch(err){
-            console.log(err);
-            msg.reply('There was an error trying to execute that command!');
-          }
-
-       });
     });
   });
 });
