@@ -98,7 +98,7 @@ module.exports = {
                 return;
               }
               else if(args.length == 2){
-                msg.guild.channels.cache.find(args[2]).then(() => {
+                msg.guild.channels.cache.get(args[2]).then(() => {
                   Servers.update({
                     General: args[2]
 
@@ -131,7 +131,7 @@ module.exports = {
                 return;
               }
               else if(args.length == 2){
-                msg.guild.channels.cache.find(args[2]).then(() => {
+                msg.guild.channels.cache.get(args[2]).then(() => {
                   Servers.update({
                     Suggest: args[2]
                   },
