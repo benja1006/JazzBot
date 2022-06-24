@@ -113,8 +113,16 @@ BotEnv.sync().then(() => {
       //Start mysql connection
     	 //add server to mysql table
       Servers.sync().then(() => {
-        Servers.create({
-          Server: guild.id
+        Servers.findAll({
+          where: {
+            Server: msg.guild.id
+          }
+        }).then(Server => {
+          if(!Server[0]){
+            Servers.create({
+              Server: guild.id
+            });
+          }
         });
       });
       console.log(guild.id);

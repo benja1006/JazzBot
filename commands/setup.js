@@ -98,9 +98,9 @@ module.exports = {
                 return;
               }
               else if(args.length == 2){
-                msg.guild.channels.cache.get(args[2]).then(() => {
+                if(msg.guild.channels.cache.has(args[1])){
                   Servers.update({
-                    General: args[2]
+                    General: args[1]
 
                   },
                   { where: {
@@ -110,7 +110,10 @@ module.exports = {
                   if(Server[0].Suggest == null){
                     msg.channel.send("If you would like to add suggestions, please type \'" + prefix +"setup suggest\' in the channel you would like to receive suggestions.");
                   }
-                }).catch(msg.channel.send("This is not a valid channel id"));
+                }
+                else{
+                  msg.channel.send("This is not a valid channel id")
+                }
                 return;
               }
               break;
@@ -131,7 +134,7 @@ module.exports = {
                 return;
               }
               else if(args.length == 2){
-                msg.guild.channels.cache.get(args[2]).then(() => {
+                if(msg.guild.channels.cache.has(args[1])){
                   Servers.update({
                     Suggest: args[2]
                   },
@@ -139,7 +142,10 @@ module.exports = {
                     Server: msg.guild.id
                   }});
                   msg.channel.send("You have updated the suggest channel for the server.")
-                }).catch(msg.channel.send("This is not a valid channel id"));
+                }
+                else{
+                  msg.channel.send("This is not a valid channel id")
+                }
                 return;
               }
           }
