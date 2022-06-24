@@ -101,7 +101,7 @@ BotEnv.sync().then(() => {
     bot.login(bot.env.DisToken).catch(err => {
       console.log(err);
     });
-    bot.on('ready', () => {
+    bot.once('ready', () => {
     	bot.user.setPresence({activity: {name: prefix}});
     	console.info(`Logged into discord as ${bot.user.tag}!`);
     });
@@ -115,7 +115,7 @@ BotEnv.sync().then(() => {
       Servers.sync().then(() => {
         Servers.findAll({
           where: {
-            Server: msg.guild.id
+            Server: guild.id
           }
         }).then(Server => {
           if(!Server[0]){

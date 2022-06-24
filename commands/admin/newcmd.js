@@ -11,23 +11,15 @@ module.exports = {
     const token = msg.guild.client.env.DisToken;
     const clientId = msg.guild.client.user.id;
     const rest = new REST({version: '9'}).setToken(token);
-    const cmd = new SlashCommandBuilder()
-      .setName('suggest')
-      .setDescription('Make a suggestion for the mods.')
-      .addStringOption(option =>
-        option.setName('suggestion')
-              .setDescription('The suggestion text')
-              .setRequired(true));
-
-      const commands = [
-        new SlashCommandBuilder()
-          .setName('suggest')
-          .setDescription('Make a suggestion for the mods.')
-          .addStringOption(option =>
-            option.setName('suggestion')
-                  .setDescription('The suggestion text')
-                  .setRequired(true))
-      ].map(command => command.toJSON());
+    const commands = [
+      new SlashCommandBuilder()
+        .setName('suggest')
+        .setDescription('Make a suggestion for the mods.')
+        .addStringOption(option =>
+          option.setName('suggestion')
+                .setDescription('The suggestion text')
+                .setRequired(true))
+    ].map(command => command.toJSON());
     (async () => {
     	try {
     		console.log('Started refreshing application (/) commands.');

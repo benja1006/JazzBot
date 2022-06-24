@@ -105,7 +105,14 @@ module.exports = {
         if(isMod){
           suggestionEmbed.color = 0xde2121;
         }
-        msg.guild.channels.cache.get(suggestID).send({ embeds: [suggestionEmbed]});
+        msg.guild.channels.cache.get(suggestID).send({ embeds: [suggestionEmbed]}).catch(err => {
+          if(!slash){
+            msg.author.send("Jazzbot doesn't have access to the suggest channel on this server. Please DM a mod to let them know.");
+          }
+          else{
+            msg.user.send("Jazzbot doesn't have access to the suggest channel on this server. Please DM a mod to let them know.");
+          }
+        });
       });
     });
 
