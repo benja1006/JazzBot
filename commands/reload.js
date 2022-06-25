@@ -1,25 +1,57 @@
+const { SlashCommandBuilder } = require('@discordjs/builders');
+
+//Get all commands
+
+const commandFiles = fs.readdirSync('./').filter(file => file.endsWith('.js'));
+const commands = [];
+for (const file of commandFiles) {
+  const command = require(`./${file}`);
+  let cmdObj = {name: command.name, value: command.name}
+  commands.push(cmdObj)
+}
+const adminCmdFiles = fs.readdirSync('./admin').filter(file => file.endsWith('.js'));
+for(const file of adminCmdFiles) {
+  let command = require(`./admin/${file}`);
+  let cmdObj = {name: command.name, value: command.name}
+  commands.push(cmdObj)
+}
 module.exports = {
   name: 'reload',
   description: 'Reloads a command',
   usage: ['command'],
   modOnly: true,
-  execute(msg, args) {
-    if (!args.length) return msg.channel.send(`You didn't pass any command to reload, ${msg.author}!`);
-    let commandName = args[0].toLowerCase();
-    if (commandName == 'reload') return msg.channel.send('Cannot reload the \`reload\` command');
-    const command = msg.client.commands.get(commandName) || msg.client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
-    if (!command) return msg.channel.send(`There is no command with name or alias \`${commandName}\`, ${msg.author}!`);
+  data: new SlashCommandBuilder()
+    .setName('reload')
+    .setDescription('Reload a command')
+    .addStringOption(option =>
+        option.setName('command')
+            .setDescription('The command to reload')
+            .setRequired(true)
+            .addChoices(commands)),
+  execute(interaction, isMod) {
+    let commandName = interaction.options.get('command')['value'];
+    if (commandName == 'reload') return interaction.reply({content: 'Cannot reload the \`reload\` command', ephemeral:true});
+    let command = interaction.client.commands.get(commandName);
+    let adminCmd = false;
+    if(!command){
+      command = interaction.client.adminCommands.get(commandName);
+      let adminCmd = true;
+    }
+    if (!command) return interaction.reply({content: `There is no command with name \`${commandName}\`, ${msg.author}!`, ephemeral:true});
 
     commandName = command.name
-
-    delete require.cache[require.resolve(`./${commandName}.js`)];
+    let filePath = `./${commandName}.js`;
+    if(adminCmd){
+      filePath = `./admin/${commandName}.js`;
+    }
+    delete require.cache[require.resolve(filePath)];
     try {
-	     const newCommand = require(`./${commandName}.js`);
-	     msg.client.commands.set(newCommand.name, newCommand);
+	     const newCommand = require(filePath);
+	     interaction.client.commands.set(newCommand.name, newCommand);
     } catch (error) {
 	     console.log(error);
-	      msg.channel.send(`There was an error while reloading a command \`${commandName}\`:\n\`${error.message}\``);
+	      interaction.reply({content: `There was an error while reloading a command \`${commandName}\`:\n\`${error.message}\``, ephemeral:true});
     }
-    msg.channel.send(`Command \`${commandName}\` was reloaded!`);
+    interaction.reply({content: `Command \`${commandName}\` was reloaded!`, ephemeral:true});
   }
 }

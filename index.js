@@ -134,7 +134,12 @@ BotEnv.sync().then(() => {
     bot.on('interactionCreate', interaction => {
       if(interaction.isCommand()){
         const {commandName} = interaction;
-        const command = bot.commands.get(commandName);
+        if(bot.commands.has(commandName)){
+          const command = bot.commands.get(commandName);
+        }
+        else{
+          const command = bot.adminCommands.get(commandName)
+        }
 
         if(!command) return;
 

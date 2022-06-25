@@ -7,6 +7,9 @@ module.exports = {
   description: 'Registers slash commands',
   aliases: ['registercmd'],
   usage: [''],
+  data: new SlashCommandBuilder()
+    .setName('registercmds')
+    .setDescription('Registers slash commands to discord servers'),
   execute(interaction, isMod, slash = true) {
     if(slash){
       const token = interaction.client.env.DisToken;
@@ -19,15 +22,6 @@ module.exports = {
       const guildId = msg.guild.id;
     }
     const rest = new REST({version: '9'}).setToken(token);
-    // const commands = [
-    //   new SlashCommandBuilder()
-    //     .setName('suggest')
-    //     .setDescription('Make a suggestion for the mods.')
-    //     .addStringOption(option =>
-    //       option.setName('suggestion')
-    //             .setDescription('The suggestion text')
-    //             .setRequired(true))
-    // ].map(command => command.toJSON());
     let commands = bot.commands.map(command => command.data.toJSON());
     let adminCommands = bot.adminCommands.map(command => command.data.toJSON());
     (async () => {

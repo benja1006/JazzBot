@@ -60,7 +60,7 @@ module.exports = {
         }
       }).then(Server => {
         if(!Server[0]){
-          return msg.reply("This server hasn't been setup properly. Please kick the bot and re add it.");
+          return interaction.reply({content: "This server hasn't been setup properly. Please kick the bot and re add it.", ephemeral:true});
         }
         suggestID = Server[0].Suggest;
         if(suggestID == null){
