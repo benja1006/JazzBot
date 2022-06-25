@@ -1,10 +1,17 @@
 const prefix = process.env.PREFIX + ' ';
+const { SlashCommandBuilder } = require('@discordjs/builders');
 module.exports = {
   name: 'help',
   description: 'List all of my commands or info about a specific command',
   aliases: ['commands'],
   usage: ['command name'],
   cooldown: 5,
+  data: new SlashCommandBuilder()
+    .setName('help')
+    .setDescription('JazzBot help')
+    .addStringOption(option =>
+      option.setName('command')
+          .setDescription('A command you want help with (optional)')),
   execute(msg, args, isMod) {
     const data = [];
     const { commands } = msg.client;

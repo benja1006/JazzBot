@@ -1,17 +1,18 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const fs = require('fs');
 
 //Get all commands
 
-const commandFiles = fs.readdirSync('./').filter(file => file.endsWith('.js'));
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 const commands = [];
 for (const file of commandFiles) {
-  const command = require(`./${file}`);
+  const command = require(`./commands/${file}`);
   let cmdObj = {name: command.name, value: command.name}
   commands.push(cmdObj)
 }
-const adminCmdFiles = fs.readdirSync('./admin').filter(file => file.endsWith('.js'));
+const adminCmdFiles = fs.readdirSync('./commands/admin').filter(file => file.endsWith('.js'));
 for(const file of adminCmdFiles) {
-  let command = require(`./admin/${file}`);
+  let command = require(`./commands/admin/${file}`);
   let cmdObj = {name: command.name, value: command.name}
   commands.push(cmdObj)
 }

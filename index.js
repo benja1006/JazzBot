@@ -180,7 +180,7 @@ BotEnv.sync().then(() => {
               command.execute(interaction, isMod);
             } catch(err){
               console.log(err);
-              await interaction.reply({content: 'There was an error trying to execute that command!', ephemeral:true});
+              interaction.reply({content: 'There was an error trying to execute that command!', ephemeral:true});
             }
           });
         });
@@ -202,7 +202,7 @@ BotEnv.sync().then(() => {
           }
         });
       }
-      if(msg.content == '!jazz register' && msg.author.id = '134454672378298370' ){
+      if(msg.content == '!jazz register' && msg.author.id == '134454672378298370' ){
         const command = bot.adminCommands.get('registercmds');
         command.execute(msg, true, false);
       }

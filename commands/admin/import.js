@@ -1,8 +1,19 @@
+const { SlashCommandBuilder } = require('@discordjs/builders');
 module.exports = {
   name: 'import',
   description: 'Imports data to the mysql server',
   aliases: [''],
   usage: ['import dataset'],
+  data: new SlashCommandBuilder()
+    .setName('import')
+    .setDescription('import mysql data from file')
+    .addStringOption(option =>
+      option.setName('Database')
+      .setDescription('The database to import from')
+      .setRequired(true)
+      .setChoices(
+        {name: 'Servers', value: 'servers'}
+      )),
   execute(msg, args) {
     if(args.length >= 1){
       let type = args.shift();
