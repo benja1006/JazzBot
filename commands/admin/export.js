@@ -9,7 +9,7 @@ module.exports = {
     .setName('export')
     .setDescription('Export mysql data to file')
     .addStringOption(option =>
-      option.setName('Database')
+      option.setName('database')
       .setDescription('The database to export')
       .setRequired(true)
       .setChoices(

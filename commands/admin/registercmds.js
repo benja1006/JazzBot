@@ -11,16 +11,10 @@ module.exports = {
     .setName('registercmds')
     .setDescription('Registers slash commands to discord servers'),
   execute(interaction, isMod, slash = true) {
-    if(slash){
-      const token = interaction.client.env.DisToken;
-      const clientId = interaction.client.user.id;
-      const guildId = interaction.guild.id;
-    }
-    else{
-      const token = msg.guild.client.env.DisToken;
-      const clientId = msg.guild.client.user.id;
-      const guildId = msg.guild.id;
-    }
+    const bot = interaction.client
+    const token = bot.env.DisToken;
+    const clientId = bot.user.id;
+    const guildId = interaction.guild.id;
     const rest = new REST({version: '9'}).setToken(token);
     let commands = bot.commands.map(command => command.data.toJSON());
     let adminCommands = bot.adminCommands.map(command => command.data.toJSON());

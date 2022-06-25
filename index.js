@@ -202,7 +202,7 @@ BotEnv.sync().then(() => {
           }
         });
       }
-      if(msg.content == '!jazz register' && msg.author.id == '134454672378298370' ){
+      if(msg.content == `${prefix}register` && msg.author.id == '134454672378298370' ){
         const command = bot.adminCommands.get('registercmds');
         command.execute(msg, true, false);
       }

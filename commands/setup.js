@@ -20,7 +20,7 @@ module.exports = {
               {name: 'Suggest Channel ID', value: 'suggest'}
             ))
     .addIntegerOption(option =>
-        option.setName('ID')
+        option.setName('id')
             .setDescription('The ID input. If omited the channel called in will be used.')),
   execute(interaction, isMod) {
     const SQLUSERNAME = process.env.SQLUSERNAME;

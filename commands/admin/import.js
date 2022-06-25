@@ -8,7 +8,7 @@ module.exports = {
     .setName('import')
     .setDescription('import mysql data from file')
     .addStringOption(option =>
-      option.setName('Database')
+      option.setName('database')
       .setDescription('The database to import from')
       .setRequired(true)
       .setChoices(

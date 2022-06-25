@@ -14,7 +14,7 @@ module.exports = {
     .addStringOption(option =>
       option.setName('suggestion')
             .setDescription('The suggestion text')
-            .setRequired(true))),
+            .setRequired(true)),
   execute(interaction, isMod) {
     //connect to mysql server
     const Sequelize = require('sequelize');

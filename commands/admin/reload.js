@@ -4,16 +4,16 @@ const fs = require('fs');
 //Get all commands
 
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
-const commands = [];
+commands = [];
 for (const file of commandFiles) {
-  const command = require(`./commands/${file}`);
-  let cmdObj = {name: command.name, value: command.name}
+  const commandName = file.slice(0,-3);
+  let cmdObj = {name: commandName, value: commandName}
   commands.push(cmdObj)
 }
 const adminCmdFiles = fs.readdirSync('./commands/admin').filter(file => file.endsWith('.js'));
 for(const file of adminCmdFiles) {
-  let command = require(`./commands/admin/${file}`);
-  let cmdObj = {name: command.name, value: command.name}
+  const commandName = file.slice(0,-3);
+  let cmdObj = {name: commandName, value: commandName}
   commands.push(cmdObj)
 }
 module.exports = {
@@ -28,7 +28,7 @@ module.exports = {
         option.setName('command')
             .setDescription('The command to reload')
             .setRequired(true)
-            .addChoices(commands)),
+            .addChoices(...commands)),
   execute(interaction, isMod) {
     let commandName = interaction.options.get('command')['value'];
     if (commandName == 'reload') return interaction.reply({content: 'Cannot reload the \`reload\` command', ephemeral:true});
