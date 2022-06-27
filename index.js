@@ -102,7 +102,7 @@ BotEnv.sync().then(() => {
       console.log(err);
     });
     bot.once('ready', () => {
-    	bot.user.setPresence({activity: {name: prefix}});
+    	bot.user.setPresence({activities: [{name: prefix}], status: 'online'});
     	console.info(`Logged into discord as ${bot.user.tag}!`);
     });
     bot.on('error', err => {
