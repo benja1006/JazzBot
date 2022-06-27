@@ -36,19 +36,21 @@ module.exports = {
     let adminCmd = false;
     if(!command){
       command = interaction.client.adminCommands.get(commandName);
-      let adminCmd = true;
+      adminCmd = true;
     }
     if (!command) return interaction.reply({content: `There is no command with name \`${commandName}\`, ${msg.author}!`, ephemeral:true});
 
     commandName = command.name
-    let filePath = `./${commandName}.js`;
+    let filePath = `../${commandName}.js`;
     if(adminCmd){
-      filePath = `./admin/${commandName}.js`;
+      filePath = `./${commandName}.js`;
     }
     delete require.cache[require.resolve(filePath)];
     try {
 	     const newCommand = require(filePath);
-	     interaction.client.commands.set(newCommand.name, newCommand);
+       if(!adminCmd) interaction.client.commands.set(newCommand.name, newCommand);
+       else interaction.client.adminCommands.set(newCommand.name, newCommand);
+
     } catch (error) {
 	     console.log(error);
 	      interaction.reply({content: `There was an error while reloading a command \`${commandName}\`:\n\`${error.message}\``, ephemeral:true});
