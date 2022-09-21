@@ -20,7 +20,7 @@ module.exports = {
     let adminCommands = bot.adminCommands.map(command => command.data.toJSON());
     (async () => {
     	try {
-    		interaction.reply({content: 'Started refreshing application (/) commands.', ephemeral: true});
+    		//interaction.reply({content: 'Started refreshing application (/) commands.', ephemeral: true});
     		await rest.put(
     			Routes.applicationCommands(clientId),
     			{ body: commands },

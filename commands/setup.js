@@ -1,5 +1,5 @@
 const prefix = process.env.PREFIX + ' ';
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 //const { SlashCommandBuilder, PermissionFlagsBits } = require('@discordjs/builders');
 module.exports = {
   name: 'setup',
@@ -20,10 +20,10 @@ module.exports = {
               {name: 'General Channel ID', value: 'general'},
               {name: 'Suggest Channel ID', value: 'suggest'}
             ))
-    .addIntegerOption(option =>
+    .addStringOption(option =>
         option.setName('id')
-            .setDescription('The ID input. If omited the channel called in will be used.')),
-    //.setDefaultMemberPermissions(PermissionFlagsBits.KickMembers | PermissionFlagsBits.BanMembers),
+            .setDescription('The ID input. If omited the channel called in will be used.'))
+    .setDefaultMemberPermissions(PermissionFlagsBits.KickMembers | PermissionFlagsBits.BanMembers),
   execute(interaction, isMod) {
     const SQLUSERNAME = process.env.SQLUSERNAME;
     const SQLPASSWORD = process.env.SQLPASSWORD;
@@ -75,13 +75,13 @@ module.exports = {
         switch(interaction.options.get('setting')['value']){
           case 'mod':
             if(!interaction.options.get('id')) return interaction.reply({content: 'Please enter the ID of the role you wish to be mod.', ephemeral:true})
-            let modRole = interaction.guild.roles.cache.get(interaction.options.get('id'));
+            let modRole = interaction.guild.roles.cache.get(interaction.options.get('id').value);
             if(modRole == null){
               return interaction.reply({content: "This is not a valid role id", ephemeral:true});
             }
             interaction.reply({content: "The "+ modRole.name +" role has been given moderator priveleges", ephemeral:true});
             Servers.update({
-              ManagerRole: interaction.options.get('id')
+              ManagerRole: interaction.options.get('id').value
             },
             { where: {
               Server: interaction.guild.id
@@ -106,9 +106,9 @@ module.exports = {
               return;
             }
             else{
-              if(interaction.guild.channels.cache.has(interaction.options.get('id'))){
+              if(interaction.guild.channels.cache.has(interaction.options.get('id').value)){
                 Servers.update({
-                  General: interaction.options.get('id')
+                  General: interaction.options.get('id').value
 
                 },
                 { where: {
@@ -141,9 +141,10 @@ module.exports = {
               return;
             }
             else{
-              if(interaction.guild.channels.cache.has(interaction.options.get('id'))){
+              console.log(interaction.options.get('id').value);
+              if(interaction.guild.channels.cache.has(interaction.options.get('id').value)){
                 Servers.update({
-                  Suggest: interaction.options.get('id')
+                  Suggest: interaction.options.get('id').value
                 },
                 { where: {
                   Server: interaction.guild.id
