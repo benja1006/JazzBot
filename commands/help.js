@@ -12,21 +12,22 @@ module.exports = {
     .addStringOption(option =>
       option.setName('command')
           .setDescription('A command you want help with (optional)')),
-  execute(msg, args, isMod) {
+  async execute(interaction, isMod) {
     const data = [];
     const { commands } = msg.client;
     //if not command is specified
-    if (!args.length){
+    if (!interaction.options.get('command')){
       data.push('Here\'s a list of all my commands:');
       data.push(commands.filter(command => !command.modOnly && !command.reqMusic).map(command => command.name).join(', '));
       if(isMod){
         data.push(commands.filter(command => command.modOnly && command.name != 'admin').map(command => command.name).join(', '));
       }
-      data.push(`\nYou can send \`${prefix}help [command name]\` to get info on a specific command!`);
-      if (msg.channel.type === 'GUILD_TEXT'){
-        msg.delete();
-      }
-      msg.author.send(data.join('\n'))
+      // go through interaction.guild.commands.fetch()   ... .cache.filter(command => command.client == interaction.client)
+      await interaciton.guild.commands.fetch(commands => {
+        data.push(commands.cache.filter(command => command.client == interaction.client).map(command => command.name).join(', '));
+      });
+      data.push(`\nYou can type \`\\help [command name]\` to get info on a specific command!`);
+      interaction.reply({content: data.join('\n'), ephemeral:true});
 	    .then(() => {
 		       if (msg.channel.type === 'DM') return;
 	    })

@@ -4,7 +4,7 @@ module.exports = {
   name: 'setup',
   description: 'Setup JazzBot on your server',
   aliases: ['setup'],
-  usage: ['setup (id)'],
+  usage: ['setup setting (id)'],
   cooldown: 5,
   modOnly: true,
   data: new SlashCommandBuilder()
@@ -72,21 +72,21 @@ module.exports = {
 
         switch(interaction.options.get('setting')['value']){
           case 'mod':
-            if(!interaction.options.get('ID')) return interaction.reply({content: 'Please enter the ID of the role you wish to be mod.', ephemeral:true})
-            let modRole = interaction.guild.roles.cache.get(interaction.options.get('ID'));
+            if(!interaction.options.get('id')) return interaction.reply({content: 'Please enter the ID of the role you wish to be mod.', ephemeral:true})
+            let modRole = interaction.guild.roles.cache.get(interaction.options.get('id'));
             if(modRole == null){
               return interaction.reply({content: "This is not a valid role id", ephemeral:true});
             }
             interaction.reply({content: "The "+ modRole.name +" role has been given moderator priveleges", ephemeral:true});
             Servers.update({
-              ManagerRole: interaction.options.get('ID')
+              ManagerRole: interaction.options.get('id')
             },
             { where: {
               Server: interaction.guild.id
             }});
             break;
           case 'general':
-            if(!interaction.options.get('ID')){
+            if(!interaction.options.get('id')){
               if(interaction.channel.type != 'GUILD_TEXT'){
                 return interaction.reply({content: "Please use this either in the general channel, or followed by the id of the general channel", ephemeral:true});
               }
@@ -104,9 +104,9 @@ module.exports = {
               return;
             }
             else{
-              if(interaction.guild.channels.cache.has(interaction.options.get('ID'))){
+              if(interaction.guild.channels.cache.has(interaction.options.get('id'))){
                 Servers.update({
-                  General: interaction.options.get('ID')
+                  General: interaction.options.get('id')
 
                 },
                 { where: {
@@ -125,7 +125,7 @@ module.exports = {
             }
             break;
           case 'suggest':
-            if(!interaction.options.get('ID')){
+            if(!interaction.options.get('id')){
               if(interaction.channel.type != 'GUILD_TEXT'){
                 return interaction.reply({content: "Please use this either in the suggest channel, or followed by the id of the suggest channel", ephemeral:true});
               }
@@ -139,9 +139,9 @@ module.exports = {
               return;
             }
             else{
-              if(interaction.guild.channels.cache.has(interaction.options.get('ID'))){
+              if(interaction.guild.channels.cache.has(interaction.options.get('id'))){
                 Servers.update({
-                  Suggest: interaction.options.get('ID')
+                  Suggest: interaction.options.get('id')
                 },
                 { where: {
                   Server: interaction.guild.id
