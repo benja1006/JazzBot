@@ -4,7 +4,7 @@ module.exports = {
   name: 'setup',
   description: 'Setup JazzBot on your server',
   aliases: ['setup'],
-  usage: ['setup setting (id)'],
+  usage: ['/setup setting (id)'],
   cooldown: 5,
   modOnly: true,
   data: new SlashCommandBuilder()
