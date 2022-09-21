@@ -92,7 +92,7 @@ module.exports = {
         if(isMod){
           suggestionEmbed.color = 0xde2121;
         }
-        msg.guild.channels.cache.get(suggestID).send({ embeds: [suggestionEmbed]}).catch(err => {
+        interaction.guild.channels.cache.get(suggestID).send({ embeds: [suggestionEmbed]}).catch(err => {
           interaction.user.send("Jazzbot doesn't have access to the suggest channel on this server. Please DM a mod to let them know.");
         });
       });

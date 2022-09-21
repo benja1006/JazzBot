@@ -4,7 +4,7 @@ module.exports = {
   name: 'export',
   description: 'Exports data from the mysql server',
   aliases: [''],
-  usage: ['export dataset'],
+  usage: ['/export dataset'],
   data: new SlashCommandBuilder()
     .setName('export')
     .setDescription('Export mysql data to file')

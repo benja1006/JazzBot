@@ -20,7 +20,7 @@ module.exports = {
     let adminCommands = bot.adminCommands.map(command => command.data.toJSON());
     (async () => {
     	try {
-    		console.log('Started refreshing application (/) commands.');
+    		interaction.reply({content: 'Started refreshing application (/) commands.', ephemeral: true});
     		await rest.put(
     			Routes.applicationCommands(clientId),
     			{ body: commands },
@@ -30,7 +30,7 @@ module.exports = {
           { body: adminCommands},
         );
 
-    		console.log('Successfully reloaded application (/) commands.');
+    		interaction.reply({content: 'Successfully reloaded application (/) commands.', ephemeral: true});
     	} catch (error) {
     		console.error(error);
     	}

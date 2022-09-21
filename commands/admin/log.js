@@ -3,7 +3,7 @@ module.exports = {
   name: 'log',
   description: 'Used to toggle logging',
   aliases: [''],
-  usage: ['log true/false'],
+  usage: ['/log true/false'],
   data: new SlashCommandBuilder()
     .setName('log')
     .setDescription('Enable or disable logging')

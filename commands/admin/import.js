@@ -3,7 +3,7 @@ module.exports = {
   name: 'import',
   description: 'Imports data to the mysql server',
   aliases: [''],
-  usage: ['import dataset'],
+  usage: ['/import dataset'],
   data: new SlashCommandBuilder()
     .setName('import')
     .setDescription('import mysql data from file')
