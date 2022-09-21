@@ -4,22 +4,14 @@
   "description": "A simple discord Bot",
   "main": "index.js",
   "dependencies": {
-    "@discordjs/opus": "^0.3.2",
-    "@discordjs/rest": "^0.5.0",
     "axios": "^0.21.1",
-    "csv": "^5.5.0",
-    "discord.js": "^13.0.0",
-    "dotenv": "^8.6.0",
+    "discord.js": "^14.4.0",
     "fs": "^0.0.1-security",
     "get-folder-size": "^2.0.1",
-    "google-auth-library": "^6.0.2",
-    "googleapis": "^51.0.0",
-    "mysql": "^2.18.1",
     "mysql2": "^2.2.5",
     "open": "^7.0.4",
     "opus": "0.0.0",
     "opusscript": "0.0.7",
-    "querystring": "^0.2.0",
     "sequelize": "^5.22.4"
   },
   "scripts": {
