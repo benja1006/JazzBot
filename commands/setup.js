@@ -1,5 +1,5 @@
 const prefix = process.env.PREFIX + ' ';
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder } = require('discord.js');
 //const { SlashCommandBuilder, PermissionFlagsBits } = require('@discordjs/builders');
 module.exports = {
   name: 'setup',

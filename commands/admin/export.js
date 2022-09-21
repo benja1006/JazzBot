@@ -1,5 +1,5 @@
 let fs = require('fs');
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder } = require('discord.js');
 module.exports = {
   name: 'export',
   description: 'Exports data from the mysql server',

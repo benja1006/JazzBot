@@ -2,9 +2,7 @@ const fs = require('fs');
 const url = require('url');
 const path = require('path');
 const getFolderSize = require('get-folder-size');
-require('dotenv').config();
-//check spotify authentication before anything else
-var tokenArr = [];
+const Discord = require('discord.js');
 
 //Mysql connection
 const Sequelize = require('sequelize');
@@ -72,12 +70,11 @@ BotEnv.sync().then(() => {
       ID: 1
     }
   }).then(env => {
-    const Discord = require('discord.js');
     const bot = new Discord.Client({
-      intents: [Discord.Intents.FLAGS.GUILD_MESSAGES,
-                Discord.Intents.FLAGS.DIRECT_MESSAGES,
-                Discord.Intents.FLAGS.GUILDS,
-                Discord.Intents.FLAGS.GUILD_PRESENCES]
+      intents: [Discord.GatewayIntentBits.GuildMessages,
+                Discord.GatewayIntentBits.DirectMessages,
+                Discord.GatewayIntentBits.Guilds,
+                Discord.GatewayIntentBits.GuildPresence]
     });
     const cooldowns = new Discord.Collection();
     const prefix = process.env.PREFIX + ' ';

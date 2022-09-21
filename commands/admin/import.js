@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder } = require('discord.js');
 module.exports = {
   name: 'import',
   description: 'Imports data to the mysql server',
