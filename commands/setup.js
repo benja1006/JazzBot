@@ -1,5 +1,6 @@
 const prefix = process.env.PREFIX + ' ';
-const { SlashCommandBuilder, PermissionFlagsBits } = require('@discordjs/builders');
+const { SlashCommandBuilder } = require('@discordjs/builders');
+//const { SlashCommandBuilder, PermissionFlagsBits } = require('@discordjs/builders');
 module.exports = {
   name: 'setup',
   description: 'Setup JazzBot on your server',
@@ -21,8 +22,8 @@ module.exports = {
             ))
     .addIntegerOption(option =>
         option.setName('id')
-            .setDescription('The ID input. If omited the channel called in will be used.'))
-    .setDefaultMemberPermissions(PermissionFlagsBits.KickMembers | PermissionFlagsBits.BanMembers),
+            .setDescription('The ID input. If omited the channel called in will be used.')),
+    //.setDefaultMemberPermissions(PermissionFlagsBits.KickMembers | PermissionFlagsBits.BanMembers),
   execute(interaction, isMod) {
     const SQLUSERNAME = process.env.SQLUSERNAME;
     const SQLPASSWORD = process.env.SQLPASSWORD;
