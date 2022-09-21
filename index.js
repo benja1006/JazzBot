@@ -3,6 +3,8 @@ const url = require('url');
 const path = require('path');
 const getFolderSize = require('get-folder-size');
 const Discord = require('discord.js');
+const { Client, GatewayIntentBits, Partials } = Discord;
+require('dotenv').config()
 
 //Mysql connection
 const Sequelize = require('sequelize');
@@ -70,11 +72,11 @@ BotEnv.sync().then(() => {
       ID: 1
     }
   }).then(env => {
-    const bot = new Discord.Client({
-      intents: [Discord.GatewayIntentBits.GuildMessages,
-                Discord.GatewayIntentBits.DirectMessages,
-                Discord.GatewayIntentBits.Guilds,
-                Discord.GatewayIntentBits.GuildPresence]
+    const bot = new Client({
+      intents: [GatewayIntentBits.GuildMessages,
+                GatewayIntentBits.DirectMessages,
+                GatewayIntentBits.Guilds,
+                GatewayIntentBits.GuildPresence]
     });
     const cooldowns = new Discord.Collection();
     const prefix = process.env.PREFIX + ' ';
