@@ -20,7 +20,7 @@
     "opus": "0.0.0",
     "opusscript": "0.0.7",
     "querystring": "^0.2.0",
-    "sequelize": "^5.22.3",
+    "sequelize": "^6.28.2",
     "steam-totp": "^2.1.1",
     "steam-user": "^4.17.0",
     "steam-web": "^0.7.0",
