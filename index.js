@@ -59,7 +59,7 @@ BotEnv.init({
     autoIncrement: true
   },
   DisToken: {
-    type: Sequelize.STRING(59),
+    type: Sequelize.STRING(70),
     autoIncrement: false
   }
 }, {
