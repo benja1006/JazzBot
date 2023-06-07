@@ -3,7 +3,7 @@ module.exports = {
   name: 'log',
   description: 'Used to toggle logging',
   aliases: [''],
-  usage: ['/log true/false'],
+  usage: ['/log On/Off'],
   data: new SlashCommandBuilder()
     .setName('log')
     .setDescription('Enable or disable logging')
@@ -14,17 +14,17 @@ module.exports = {
           {name: 'On', value: 'on'},
           {name: 'Off', value: 'off'}
         )),
-  execute(msg, args) {
-    switch(args[0]){
+  execute(interaction, isMod) {
+    switch(interaction.options.get('position').value){
       case 'on':
       case 'true':
-        msg.client.log = true;
-        msg.channel.send('Logging turned on');
+        interaction.client.log = true;
+        interaction.reply('Logging turned on');
         break;
       case 'false':
       case 'off':
-        msg.client.log = false;
-        msg.channel.send('Logging turned off');
+        interaction.client.log = false;
+        interaction.reply({content: 'Logging turned off', ephemeral: true});
     }
   },
 }

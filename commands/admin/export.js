@@ -15,7 +15,7 @@ module.exports = {
       .setChoices(
         {name: 'Servers', value: 'servers'}
       )),
-  execute(msg, args) {
+  execute(interaction, isMod) {
     const Sequelize = require('sequelize');
     const SQLUSERNAME = process.env.SQLUSERNAME;
     const SQLPASSWORD = process.env.SQLPASSWORD;
@@ -51,7 +51,7 @@ module.exports = {
       sequelize,
       modelName: 'Servers'
     });
-    let type = args[0].toLowerCase();
+    let type = interaction.options.get('database').value
     switch(type){
       case "servers":
         Servers.sync().then(
@@ -66,7 +66,7 @@ module.exports = {
             await fs.writeFile('./exportFiles/servers.csv', filedata.join('\n'), (err) => {
               console.log(Server.Server)
             });
-            msg.reply({ files: ['./exportFiles/servers.csv'], ethereal: true});
+            interaction.reply({ files: ['./exportFiles/servers.csv'], ethereal: true});
           })
         )
     }
