@@ -76,7 +76,8 @@ BotEnv.sync().then(() => {
       intents: [GatewayIntentBits.GuildMessages,
                 GatewayIntentBits.DirectMessages,
                 GatewayIntentBits.Guilds,
-                GatewayIntentBits.GuildPresences]
+                GatewayIntentBits.GuildPresences,
+                GatewayIntentBits.MessageContent]
     });
     const cooldowns = new Discord.Collection();
     const prefix = process.env.PREFIX + ' ';
