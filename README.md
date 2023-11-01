@@ -1,6 +1,3 @@
 # JazzBot
- To setup, run `./build-app`
- create a .env with PREFIX and SQLUSERNAME and SQLPASSWORD items
- run `./run-app`
- The first run will fail. Once the mysql server is up, insert env items to `envSetup.js` and run it.
- Now the env is set up, run `docker-compose down`, then `./run-app` again
+
+Jazzbot is a fairly simple discord bot using the discord.js library. This project was practice in writing and modifying code over a long period of time, including updating code as dependencies were updated. The project is also fully dockerized so that it can be run on any operating system, or on a server. Finally, this is the only code that I have that is written to function constantly, with minimal down time.
