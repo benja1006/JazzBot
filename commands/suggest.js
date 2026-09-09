@@ -1,19 +1,11 @@
-const prefix = process.env.PREFIX + ' ';
-const Discord = require('discord.js');
+const { MessageFlags } = require('discord.js');
 module.exports = {
   name: 'suggest',
-  description: 'Suggest something to the Moderators',
+  description: 'Suggest something to the moderators',
   aliases: ['suggestion'],
-  usage: ['suggest suggestion'],
   cooldown: 300,
-  guildOnly: true,
   modOnly: false,
-  reqMusic: false,
-  execute(msg, args, isMod) {
-    if(args.length == 0){
-      return msg.author.send("Please include a message in your suggestion");
-    }
-    //connect to mysql server
+  async execute(interaction, isMod) {
     const Sequelize = require('sequelize');
     const SQLUSERNAME = process.env.SQLUSERNAME;
     const SQLPASSWORD = process.env.SQLPASSWORD;
@@ -22,7 +14,6 @@ module.exports = {
       host: 'mysql',
       dialect: 'mysql'
     });
-    //create Server model
     class Servers extends Model {}
     Servers.init({
       ID: {
@@ -45,56 +36,49 @@ module.exports = {
       ManagerRole: {
         type: Sequelize.BIGINT(18),
         autoIncrement: false
-      },
-      Music: {
-        type: Sequelize.BOOLEAN,
       }
     }, {
       sequelize,
       modelName: 'Servers'
     });
-    Servers.sync().then(() => {
-      Servers.findAll({
-        where: {
-          Server: msg.guild.id
-        }
-      }).then(Server => {
-        if(!Server[0]){
-          return msg.reply("This server hasn't been setup properly. Please kick the bot and re add it.");
-        }
-        suggestID = Server[0].Suggest;
-        if(suggestID == null){
-          return msg.reply("Suggestions are not yet enabled on this server.");
-        }
-        if(msg.guild.channels.cache.get(!suggestID)){
-          return msg.reply("The suggest channel has been incorrectly setup on this server. Please contact a mod for help.");
-        }
-        var suggestion = args[0];
-        for(i = 1; i<args.length; i++){
-          suggestion = suggestion.concat(" ", args[i]);
-        }
-        msg.delete();
-        msg.author.send("Thank you for your suggestion. It has been forwarded to the mod team!").catch();
-        const suggestionEmbed = {
-          color: 0x34ebde,
-          title: "Suggestion by " + msg.author.tag,
-          fields: [
-            {
-              name: 'UserID',
-              value: msg.author.id,
-            },
-            {
-              name: 'Suggestion',
-              value: suggestion,
-            },
-          ],
-        };
-        if(isMod){
-          suggestionEmbed.color = 0xde2121;
-        }
-        msg.guild.channels.cache.get(suggestID).send({ embed: suggestionEmbed});
-      });
-    });
 
+    await Servers.sync();
+    const Server = await Servers.findAll({
+      where: {
+        Server: interaction.guild.id
+      }
+    });
+    if (!Server[0]) {
+      return interaction.reply({ content: 'This server hasn\'t been setup properly. Please kick the bot and re add it.', flags: MessageFlags.Ephemeral });
+    }
+
+    const suggestID = Server[0].Suggest;
+    if (suggestID == null) {
+      return interaction.reply({ content: 'Suggestions are not yet enabled on this server.', flags: MessageFlags.Ephemeral });
+    }
+
+    const suggestChannel = interaction.guild.channels.cache.get(suggestID);
+    if (!suggestChannel) {
+      return interaction.reply({ content: 'The suggest channel has been incorrectly setup on this server. Please contact a mod for help.', flags: MessageFlags.Ephemeral });
+    }
+
+    const suggestion = interaction.options.getString('text', true);
+    const suggestionEmbed = {
+      color: isMod ? 0xde2121 : 0x34ebde,
+      title: `Suggestion by ${interaction.user.tag}`,
+      fields: [
+        {
+          name: 'UserID',
+          value: interaction.user.id,
+        },
+        {
+          name: 'Suggestion',
+          value: suggestion,
+        },
+      ],
+    };
+
+    await suggestChannel.send({ embeds: [suggestionEmbed] });
+    return interaction.reply({ content: 'Thank you for your suggestion. It has been forwarded to the mod team!', flags: MessageFlags.Ephemeral });
   },
 };
