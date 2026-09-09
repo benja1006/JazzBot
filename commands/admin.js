@@ -1,28 +1,21 @@
-const prefix = process.env.PREFIX + ' ';
+const { MessageFlags } = require('discord.js');
 module.exports = {
   name: 'admin',
-  description: 'Admin commands for jazzBot',
-  aliases: [''],
-  usage: ['admin command'],
+  description: 'Admin-only commands for JazzBot',
   cooldown: 0,
-  reqMusic: false,
   modOnly: true,
-  execute(msg, args) {
-    const bot = msg.client;
-    if(!args.length >= 1) {
-      return msg.reply('Please include an admin command');
+  async execute(interaction) {
+    const bot = interaction.client;
+    const subcommand = interaction.options.getSubcommand();
+    const command = bot.adminCommands.get(subcommand);
+    if (!command) {
+      return interaction.reply({ content: 'That admin command doesn\'t exist. Try /admin help for help.', flags: MessageFlags.Ephemeral });
     }
-    const commandName = args.shift().toLowerCase();
-    if(!bot.adminCommands.has(commandName)) {
-      return msg.reply(`That command does not exist. Try ${prefix}admin help for help`);
-    }
-    const command = bot.adminCommands.get(commandName);
-    try{
-      command.execute(msg, args);
-    }
-      catch(err) {
+    try {
+      await command.execute(interaction);
+    } catch (err) {
       console.log(err);
-      msg.reply('There was an error trying to execute that command!');
+      return interaction.reply({ content: 'There was an error trying to execute that command!', flags: MessageFlags.Ephemeral });
     }
   },
 };

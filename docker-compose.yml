@@ -3,17 +3,13 @@ services:
   jazzbot:
     container_name: jazz_bot_app
     image: jazz_bot:latest
-    command: /bin/bash -c "/wait && node index.js "
+    command: node index.js
     working_dir: /app
     volumes:
       - ./:/app
-    environment:
-      - WAIT_HOSTS=mysql:3306
-      - WAIT_HOSTS_TIMEOUT=300
-      - WAIT_SLEEP_INTERVAL=5
-      - WAIT_HOST_CONNECT_TIMEOUT=30
     depends_on:
-      - "mysql"
+      mysql:
+        condition: service_healthy
   mysql:
     container_name: jazz_bot_db
     image: mysql:latest
@@ -26,5 +22,10 @@ services:
       - "3306:3306"
     cap_add:
       - SYS_NICE  # CAP_SYS_NICE
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
 volumes:
   jazzbot-mysql-data:
